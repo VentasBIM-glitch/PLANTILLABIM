@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
@@ -77,7 +77,6 @@
   </div>
   <div class="panel">
     <div class="grid">
-      <div class="field"><label>Mercaderista</label><input id="mercaderista" placeholder="Nombre"/></div>
       <div class="field"><label>Ruta</label><input id="ruta" placeholder="Ruta"/></div>
       <div class="field"><label>Cliente / Tienda</label><input id="cliente" placeholder="Cliente / tienda"/></div>
       <div class="field"><label>Día</label>
@@ -106,10 +105,10 @@
       <button class="btn-only"  id="btnOnly">Solo pedidos</button>
       
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
       <button id="btnExcelTop" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6);border-radius:14px;min-height:48px;font-size:14px;font-weight:800;color:#fff;border:none;cursor:pointer;">📊 Excel</button>
       <button id="btnPdfTop"   style="background:linear-gradient(135deg,#b45309,#d97706);border-radius:14px;min-height:48px;font-size:14px;font-weight:800;color:#fff;border:none;cursor:pointer;">📄 PDF</button>
-      <button id="btnShare"    style="background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:14px;min-height:48px;font-size:14px;font-weight:800;color:#fff;border:none;cursor:pointer;">💬 WA</button>
+
     </div>
     <input type="file" id="uploadFile" accept=".csv" style="display:none"/>
     <button class="btn-upload" id="btnUpload">Actualizar lista de productos (CSV)</button>
@@ -128,7 +127,7 @@
     <div class="foot-btns">
       <button id="btnExcelBot" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6);border-radius:14px;min-height:46px;min-width:80px;font-size:13px;font-weight:800;color:#fff;border:none;cursor:pointer;">📊 Excel</button>
       <button id="btnPdfBot"   style="background:linear-gradient(135deg,#b45309,#d97706);border-radius:14px;min-height:46px;min-width:80px;font-size:13px;font-weight:800;color:#fff;border:none;cursor:pointer;">📄 PDF</button>
-      <button id="btnShareBot" style="background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:14px;min-height:46px;min-width:80px;font-size:13px;font-weight:800;color:#fff;border:none;cursor:pointer;">💬 WA</button>
+
     </div>
   </div>
 </div>
@@ -271,7 +270,7 @@ function render(){
 
 // ── Descargar CSV/Excel ───────────────────────────────
 function exportExcel(){
-  var merc  = document.getElementById('mercaderista').value||'pedido';
+  var merc  = 'pedido';
   var ruta  = document.getElementById('ruta').value||'';
   var cli   = document.getElementById('cliente').value||'';
   var dia   = document.getElementById('fecha').value||'';
@@ -297,7 +296,7 @@ function exportExcel(){
 
 // ── PDF (vista previa en página) ──────────────────────
 function exportPdf(){
-  var merc  = document.getElementById('mercaderista').value||'Mercaderista';
+  var merc  = 'Mercaderista';
   var ruta  = document.getElementById('ruta').value||'';
   var cli   = document.getElementById('cliente').value||'';
   var dia   = document.getElementById('fecha').value||'';
@@ -468,8 +467,6 @@ document.getElementById('btnExcelTop').addEventListener('click', exportExcel);
 document.getElementById('btnExcelBot').addEventListener('click', exportExcel);
 document.getElementById('btnPdfTop').addEventListener('click', exportPdf);
 document.getElementById('btnPdfBot').addEventListener('click', exportPdf);
-document.getElementById('btnShare').addEventListener('click', shareWhatsApp);
-document.getElementById('btnShareBot').addEventListener('click', shareWhatsApp);
 window.addEventListener('resize', render);
 
 render();
