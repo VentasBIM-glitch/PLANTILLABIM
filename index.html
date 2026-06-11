@@ -1,0 +1,500 @@
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Pedido Mercaderistas Móvil</title>
+  <style>
+    :root{--bg:#0f0f14;--panel:#15151d;--line:#2a2a38;--text:#fff;--muted:#b7b7c9;--accent:#8b5cf6;--accent2:#c026d3;--radius:16px;}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);}
+    .app{max-width:900px;margin:0 auto;padding:14px 14px 100px;}
+    .hero{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:14px;}
+    .hero h1{margin:0;font-size:22px;line-height:1.1;}
+    .hero p{margin:4px 0 0;color:var(--muted);font-size:12px;}
+    .badge{background:#26183d;color:#e8d5ff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;white-space:nowrap;}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:12px;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+    .field input{width:100%;height:44px;padding:10px 12px;border-radius:12px;border:1px solid #303046;background:#10121a;color:var(--text);font-size:16px;}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px;}
+    .stat .n{font-size:22px;font-weight:800;color:#d8b4fe;}
+    .stat .l{font-size:12px;color:var(--muted);margin-top:4px;}
+    .tools{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 80%,rgba(15,15,20,0));padding-bottom:8px;margin-bottom:8px;}
+    .search{width:100%;height:46px;padding:12px 14px;border-radius:14px;border:1px solid #303046;background:#10121a;color:#fff;font-size:16px;margin-bottom:10px;}
+    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
+    button{border:none;border-radius:14px;min-height:46px;padding:10px 12px;font-weight:800;font-size:14px;color:#fff;cursor:pointer;}
+    .btn-clear{background:#36384a;}
+    .btn-only{background:#173126;color:#d1fae5;}
+    .btn-excel{background:linear-gradient(135deg,#5b21b6,#8b5cf6);}
+    .btn-pdf{background:linear-gradient(135deg,#b45309,#d97706);}
+    .btn-upload{width:100%;background:#1a2a1a;color:#86efac;border:1.5px dashed #4ade80;margin-bottom:4px;}
+    .upload-status{font-size:12px;color:#86efac;min-height:16px;margin-bottom:6px;}
+    .smallnote{font-size:11px;color:var(--muted);}
+    .list{display:flex;flex-direction:column;gap:10px;}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;}
+    .topline{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px;}
+    .product{font-weight:800;font-size:15px;line-height:1.25;}
+    .price{font-weight:800;color:#c4b5fd;white-space:nowrap;font-size:14px;}
+    .meta{color:var(--muted);font-size:12px;line-height:1.4;margin-bottom:10px;}
+    .row{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:center;}
+    .stepper{display:grid;grid-template-columns:48px 1fr 48px;gap:6px;align-items:center;}
+    .step-btn{min-height:48px;padding:0;font-size:26px;border-radius:12px;background:#232336;}
+    .qty-display{min-height:48px;font-size:22px;font-weight:800;border-radius:12px;background:#1e1e30;border:2px solid #8b5cf6;color:#fff;cursor:pointer;width:100%;}
+    .qty-box label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;}
+    .line-money{height:48px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#c4b5fd;font-weight:700;}
+    .line-total{margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);}
+    .line-total strong{color:#fff;font-size:15px;}
+    .footbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(15,15,20,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));}
+    .footgrid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;}
+    .footsum .t1{font-size:12px;color:var(--muted);}
+    .footsum .t2{font-size:17px;font-weight:800;}
+    .foot-btns{display:flex;gap:8px;}
+    .foot-btns button{min-width:90px;font-size:13px;}
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);align-items:flex-end;justify-content:center;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:#1b1b25;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;}
+    .modal-sub{font-size:11px;color:#b7b7c9;margin-bottom:4px;}
+    .modal-name{font-weight:800;font-size:15px;margin-bottom:18px;line-height:1.3;}
+    .modal-input{width:100%;height:68px;font-size:36px;font-weight:800;text-align:center;border-radius:16px;border:2px solid #8b5cf6;background:#10121a;color:#fff;margin-bottom:16px;}
+    .modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .modal-cancel{background:#232336;}
+    .modal-ok{background:linear-gradient(135deg,#c026d3,#8b5cf6);}
+    @media(min-width:700px){
+      .grid{grid-template-columns:repeat(4,1fr);}
+      .stats{grid-template-columns:repeat(4,1fr);}
+      .list.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <div><h1>HOJA DE PEDIDO ELECTRONICA</h1><p>BIMBO DE PANAMÁ, S.A.</p></div>
+    <div class="badge" id="badgeCount">113 productos</div>
+  </div>
+  <div class="panel">
+    <div class="grid">
+      <div class="field"><label>Mercaderista</label><input id="mercaderista" placeholder="Nombre"/></div>
+      <div class="field"><label>Ruta</label><input id="ruta" placeholder="Ruta"/></div>
+      <div class="field"><label>Cliente / Tienda</label><input id="cliente" placeholder="Cliente / tienda"/></div>
+      <div class="field"><label>Día</label>
+        <select id="fecha" style="width:100%;height:44px;padding:10px 12px;border-radius:12px;border:1px solid #303046;background:#10121a;color:#fff;font-size:16px;">
+          <option value="">Seleccionar...</option>
+          <option value="Lunes">Lunes</option>
+          <option value="Martes">Martes</option>
+          <option value="Miércoles">Miércoles</option>
+          <option value="Jueves">Jueves</option>
+          <option value="Viernes">Viernes</option>
+          <option value="Sábado">Sábado</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="n" id="statItems">0</div><div class="l">Productos pedidos</div></div>
+    <div class="stat"><div class="n" id="statPieces">0</div><div class="l">Piezas</div></div>
+    <div class="stat"><div class="n" id="statAmount">$0.00</div><div class="l">Total estimado</div></div>
+    <div class="stat"><div class="n" id="statVisible">0</div><div class="l">Visibles</div></div>
+  </div>
+  <div class="tools">
+    <input id="search" class="search" placeholder="Buscar producto, código o barra..."/>
+    <div class="actions">
+      <button class="btn-clear" id="btnClear">Limpiar</button>
+      <button class="btn-only"  id="btnOnly">Solo pedidos</button>
+      
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+      <button id="btnExcelTop" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6);border-radius:14px;min-height:48px;font-size:14px;font-weight:800;color:#fff;border:none;cursor:pointer;">📊 Excel</button>
+      <button id="btnPdfTop"   style="background:linear-gradient(135deg,#b45309,#d97706);border-radius:14px;min-height:48px;font-size:14px;font-weight:800;color:#fff;border:none;cursor:pointer;">📄 PDF</button>
+      <button id="btnShare"    style="background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:14px;min-height:48px;font-size:14px;font-weight:800;color:#fff;border:none;cursor:pointer;">💬 WA</button>
+    </div>
+    <input type="file" id="uploadFile" accept=".csv" style="display:none"/>
+    <button class="btn-upload" id="btnUpload">Actualizar lista de productos (CSV)</button>
+    <div class="upload-status" id="uploadStatus"></div>
+    <div class="smallnote">Toca el número central para escribir la cantidad.</div>
+  </div>
+  <div id="list" class="list"></div>
+</div>
+
+<div class="footbar">
+  <div class="footgrid">
+    <div class="footsum">
+      <div class="t1">Resumen del pedido</div>
+      <div class="t2" id="footSummary">0 piezas · $0.00</div>
+    </div>
+    <div class="foot-btns">
+      <button id="btnExcelBot" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6);border-radius:14px;min-height:46px;min-width:80px;font-size:13px;font-weight:800;color:#fff;border:none;cursor:pointer;">📊 Excel</button>
+      <button id="btnPdfBot"   style="background:linear-gradient(135deg,#b45309,#d97706);border-radius:14px;min-height:46px;min-width:80px;font-size:13px;font-weight:800;color:#fff;border:none;cursor:pointer;">📄 PDF</button>
+      <button id="btnShareBot" style="background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:14px;min-height:46px;min-width:80px;font-size:13px;font-weight:800;color:#fff;border:none;cursor:pointer;">💬 WA</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal cantidad -->
+<div class="modal-overlay" id="qtyModal">
+  <div class="modal-box">
+    <div class="modal-sub"  id="modalSub"></div>
+    <div class="modal-name" id="modalName"></div>
+    <input class="modal-input" id="modalInput" type="tel" placeholder="0"/>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="modalCancel">Cancelar</button>
+      <button class="modal-ok"     id="modalOk">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = [{"barcode": "7441029517392", "codigo": 603, "producto": "Hamburguesa Artesanal 1p 350g Bolsa BIM", "cupo": 10.0, "precio": 1.78}, {"barcode": "7441029507768", "codigo": 25544, "producto": "Hamburguesa 1p 350G Bolsa BIM", "cupo": 10.0, "precio": 1.4}, {"barcode": "085742200109", "codigo": 46916, "producto": "Hamburguesa regular 1p 390g Bolsa ID", "cupo": 6.0, "precio": 1.53}, {"barcode": "7441029525083", "codigo": 506343, "producto": "Hamburguesa Papa 4p 350g BIM", "cupo": 10.0, "precio": 1.94}, {"barcode": "085742801078", "codigo": 46939, "producto": "Jumbo Burger 1p 950 Bolsa ID", "cupo": 4.0, "precio": 3.09}, {"barcode": "7441029524918", "codigo": 506203, "producto": "Jumbo Burguer 6P 475g Bolsa IDE", "cupo": 6.0, "precio": 1.71}, {"barcode": "7441029500301", "codigo": 505888, "producto": "Hot Dog 1p 325g Bolsa BIM", "cupo": 10.0, "precio": 1.28}, {"barcode": "7441029500318", "codigo": 505886, "producto": "Hot Dog con ajonjolì 1p 325g Bolsa BIM", "cupo": 10.0, "precio": 1.37}, {"barcode": "085742200116", "codigo": 46917, "producto": "Hot Dog Regular 1p 390g Bolsa ID", "cupo": 10.0, "precio": 1.25}, {"barcode": "7441029524673", "codigo": 506051, "producto": "Hamburguesa Dorado BIM 320g", "cupo": 10.0, "precio": 1.4}, {"barcode": "7441029527506", "codigo": 964014, "producto": "Bimbolitas Arandanos 180g BIM", "cupo": 20.0, "precio": 1.05}, {"barcode": "7441029527476", "codigo": 964013, "producto": "Bimbolitas Pasas 180g BIM", "cupo": 20.0, "precio": 1.05}, {"barcode": "7441029526981", "codigo": 964181, "producto": "Hot dog Artesano 6p 450g BIM", "cupo": 9.0, "precio": 1.78}, {"barcode": "7441029504613", "codigo": 21744, "producto": "Principe Vainilla Choco 1p 85g Flow MAR", "cupo": 79.0, "precio": 0.52}, {"barcode": "7441029506181", "codigo": 23173, "producto": "Principe Choco Blanco 1p 85g Flow MAR", "cupo": 79.0, "precio": 0.52}, {"barcode": "7441029515268", "codigo": 41901, "producto": "Principe Limon 1p 106g Flow MAR", "cupo": 79.0, "precio": 0.52}, {"barcode": "7441029518627", "codigo": 500846, "producto": "Bigotes Relleno Dulce Leche 1p 60g", "cupo": 48.0, "precio": 0.65}, {"barcode": "757528049430", "codigo": 203928, "producto": "Bimbojaldres Hojaldritas 1p 45g", "cupo": 90.0, "precio": 0.31}, {"barcode": "7441029504859", "codigo": 21821, "producto": "Cup cake vainilla 1p 80g", "cupo": 48.0, "precio": 0.85}, {"barcode": "7441029504842", "codigo": 21822, "producto": "Cup cake chocolate 1p 80g", "cupo": 48.0, "precio": 0.85}, {"barcode": "7441029504866", "codigo": 22157, "producto": "Cup cake con pasitas 1p 80g", "cupo": 48.0, "precio": 0.85}, {"barcode": "7441029511543", "codigo": 29045, "producto": "Cupcake vainilla 1p 160g Flow BIM", "cupo": 20.0, "precio": 1.43}, {"barcode": "7441029507355", "codigo": 26495, "producto": "Mr brown choco Relleno choc 1p 55g", "cupo": 48.0, "precio": 0.65}, {"barcode": "7441029507348", "codigo": 26496, "producto": "Mr brown choc Rell DulLeche 1p 60g", "cupo": 48.0, "precio": 0.65}, {"barcode": "7401006712301", "codigo": 1825, "producto": "Panque de Pasas 1p 250g", "cupo": 18.0, "precio": 1.62}, {"barcode": "7441029516906", "codigo": 40199, "producto": "Panque Vainilla 1p 250g", "cupo": 18.0, "precio": 1.62}, {"barcode": "7441029514179", "codigo": 7788, "producto": "Pan Blanco Artesano 1p 535g", "cupo": 9.0, "precio": 1.74}, {"barcode": "7441029518528", "codigo": 500813, "producto": "PanIntegral Artesano 1p 535g", "cupo": 9.0, "precio": 2.13}, {"barcode": "7441029526912", "codigo": 963925, "producto": "Pan MasaMadre Artesano 1p 420g", "cupo": 10.0, "precio": 1.74}, {"barcode": "7441029527773", "codigo": 964196, "producto": "Pancitos Dulce Artesano 1p 290g", "cupo": 10.0, "precio": 1.78}, {"barcode": "7441029523249", "codigo": 963895, "producto": "Trenza Canela Artesano 1p 400g", "cupo": 8.0, "precio": 3.06}, {"barcode": "7441029516616", "codigo": 1402, "producto": "Pan de Huevo 1p 480g", "cupo": 12.0, "precio": 1.9}, {"barcode": "7441029527179", "codigo": 963935, "producto": "Pan Blanco Natural 580 g", "cupo": 9.0, "precio": 1.47}, {"barcode": "7441029523607", "codigo": 505787, "producto": "Pan Blanco Actidefens 1p 535g BOLSA BIM", "cupo": 10.0, "precio": 1.47}, {"barcode": "7441029524895", "codigo": 506287, "producto": "Pan Butter Top Bimbo 1p 690g", "cupo": 7.0, "precio": 2.13}, {"barcode": "7441029556773", "codigo": 1581, "producto": "Pan Blanco 1p 720g", "cupo": 7.0, "precio": 1.86}, {"barcode": "7441029511871", "codigo": 29625, "producto": "Pan Blanco Golden Line 1p 650g", "cupo": 10.0, "precio": 1.43}, {"barcode": "7441029512359", "codigo": 39842, "producto": "Pan Blanco Especial 1p 450g", "cupo": 12.0, "precio": 1.43}, {"barcode": "085742100102", "codigo": 46914, "producto": "Pan Blanco Pullman 1p 535g Bolsa ID", "cupo": 10.0, "precio": 1.36}, {"barcode": "7441029500325", "codigo": 8705, "producto": "Pan Integral 1p 530g BIM", "cupo": 12.0, "precio": 1.51}, {"barcode": "7441029526936", "codigo": 963883, "producto": "Pan Integral Proteina 1p 540g BIM", "cupo": 12.0, "precio": 1.51}, {"barcode": "7441029526417", "codigo": 963957, "producto": "Pan Integral 1p 630g Jaguar", "cupo": 10.0, "precio": 1.94}, {"barcode": "7441029525212", "codigo": 506215, "producto": "Pan Integral 1p 570g Bolsa ID", "cupo": 10.0, "precio": 1.51}, {"barcode": "7441029526394", "codigo": 963982, "producto": "Pan Mantequilla Jaguar 1p 550 g", "cupo": 10.0, "precio": 1.78}, {"barcode": "7441029526387", "codigo": 965214, "producto": "Pan Mantequilla 525 ID", "cupo": 10.0, "precio": 1.51}, {"barcode": "7441029526363", "codigo": 965213, "producto": "Pan Pullman Mantequilla 515 ID", "cupo": 10.0, "precio": 1.43}, {"barcode": "7441029503791", "codigo": 20049, "producto": "Pan Pasitas 1p 500g", "cupo": 15.0, "precio": 1.94}, {"barcode": "74000685", "codigo": 39770, "producto": "Pinguinos 1p 80g Flow MAR", "cupo": 48.0, "precio": 0.89}, {"barcode": "7441029507041", "codigo": 24184, "producto": "Pan Tostado Integral 1p 680g", "cupo": 42.0, "precio": 2.13}, {"barcode": "7441029500417", "codigo": 5244, "producto": "Pan Molido 1p 165g", "cupo": 36.0, "precio": 0.85}, {"barcode": "7441029508444", "codigo": 26193, "producto": "Rapiditas Clasicas 1p 312g", "cupo": 27.0, "precio": 1.87}, {"barcode": "7441029525175", "codigo": 506241, "producto": "Rapiditas Mantequilla 1p 260g", "cupo": 27.0, "precio": 1.86}, {"barcode": "7441029518535", "codigo": 500821, "producto": "Rapiditas ChiayQuinoa 1p 250g", "cupo": 27.0, "precio": 1.97}, {"barcode": "7441029507249", "codigo": 964460, "producto": "Rapiditas Integral 1p 250g", "cupo": 27.0, "precio": 1.97}, {"barcode": "7441029508307", "codigo": 26460, "producto": "Rapiditas Light 1p 260g", "cupo": 27.0, "precio": 1.97}, {"barcode": "7441029506709", "codigo": 25348, "producto": "Rapiditas Wraps 1p 320g", "cupo": 12.0, "precio": 2.13}, {"barcode": "7441029508116", "codigo": 25975, "producto": "Principe Vainilla 5p 210g", "cupo": 18.0, "precio": 1.23}, {"barcode": "7441029508147", "codigo": 25976, "producto": "Principe Choco Blanco 5p  210g", "cupo": 18.0, "precio": 1.15}, {"barcode": "7441029500202", "codigo": 501248, "producto": "Hamburguesa con ajonjo 1p 450g bim", "cupo": 6.0, "precio": 1.74}, {"barcode": "7441029519327", "codigo": 501970, "producto": "Pinguinos Triple Chocola 1p 80g", "cupo": 48.0, "precio": 0.89}, {"barcode": "7441029556025", "codigo": 1233, "producto": "Pan Tostado Doble Fibra 1", "cupo": 42.0, "precio": 2.13}, {"barcode": "74000654", "codigo": 8534, "producto": "Submarinos Vainilla 1p 64g", "cupo": 35.0, "precio": 0.58}, {"barcode": "74000661", "codigo": 8535, "producto": "Submarinos Fresa 1p 64g", "cupo": 35.0, "precio": 0.58}, {"barcode": "7441029524185", "codigo": 963975, "producto": "Artesano Nuez y Almendra 5p 250g BIM", "cupo": 20.0, "precio": 2.22}, {"barcode": "7441029524192", "codigo": 963976, "producto": "Artesano Frutos Rojos 5p 250g BIM", "cupo": 20.0, "precio": 2.22}, {"barcode": "7441029525144", "codigo": 963589, "producto": "LoopsChicle 10p 320g", "cupo": 14.0, "precio": 1.48}, {"barcode": "7441029525151", "codigo": 963590, "producto": "LoopsNapolitano 10p 320g", "cupo": 14.0, "precio": 1.48}, {"barcode": "7441029526691", "codigo": 963759, "producto": "Takis Chile Limón 1p 68g FLOW BAR", "cupo": 30.0, "precio": 0.67}, {"barcode": "7441029526714", "codigo": 963761, "producto": "Takis Chile Limón 1p 190G FLOW BAR", "cupo": 12.0, "precio": 1.85}, {"barcode": "7500810030325", "codigo": 963624, "producto": "Takis Intense Nacho 1p 190g", "cupo": 12.0, "precio": 1.63}, {"barcode": "7500810032404", "codigo": 963625, "producto": "Takis Intense Nacho 1p 68g", "cupo": 30.0, "precio": 0.67}, {"barcode": "757528013486", "codigo": 36469, "producto": "Takis Original 1p 90g Flow BIM", "cupo": 35.0, "precio": 0.81}, {"barcode": "7500810031506", "codigo": 515092, "producto": "Takis Fuego 1p 68g Flow BIM", "cupo": 30.0, "precio": 0.92}, {"barcode": "7441029515374", "codigo": 42114, "producto": "Principe Limon 5p 210g", "cupo": 18.0, "precio": 1.23}, {"barcode": "757528024581", "codigo": 122874, "producto": "Takis Original 1p 190g Flow", "cupo": 12.0, "precio": 1.63}, {"barcode": "757528028947", "codigo": 123490, "producto": "Takis fuego 1p 190g Flow", "cupo": 12.0, "precio": 1.63}, {"barcode": "7500810031544", "codigo": 515096, "producto": "Blue Heat Takis 68g", "cupo": 36.0, "precio": 0.67}, {"barcode": "757528049836", "codigo": 128940, "producto": "Blue Heat Takis 190g", "cupo": 12.0, "precio": 1.63}, {"barcode": "7441029526813", "codigo": 963754, "producto": "Unbig Mix Fuego 200g", "cupo": 12.0, "precio": 2.15}, {"barcode": "7441029527056", "codigo": 963861, "producto": "Chips Fuego 1p 100g Flow BAR", "cupo": 15.0, "precio": 1.38}, {"barcode": "7441029527063", "codigo": 963862, "producto": "Chips Jalapeño 1p 100g Flow BAR", "cupo": 15.0, "precio": 1.38}, {"barcode": "757528038908", "codigo": 124949, "producto": "Chips Sal 1p 170g Flow", "cupo": 8.0, "precio": 2.22}, {"barcode": "757528040499", "codigo": 125188, "producto": "Chips Jalapeño 170g Flow", "cupo": 8.0, "precio": 2.22}, {"barcode": "757528040468", "codigo": 125185, "producto": "Chips Fuego 1p 170g Flow", "cupo": 8.0, "precio": 2.22}, {"barcode": "7441029523232", "codigo": 203971, "producto": "Nachos Horneados 1p 150g", "cupo": 12.0, "precio": 2.41}, {"barcode": "7441029525106", "codigo": 506205, "producto": "Galleta Arroz Integral 1p 108g", "cupo": 10.0, "precio": 1.94}, {"barcode": "7441029525113", "codigo": 506206, "producto": "Galleta Arroz Quinua Sal 1p 108g", "cupo": 10.0, "precio": 1.94}, {"barcode": "658480001101", "codigo": 504757, "producto": "Galletas Salmas 1p 144g Cja SAN", "cupo": 20.0, "precio": 2.28}, {"barcode": "7441029510546", "codigo": 504788, "producto": "Pan Vital Semill 600g Bolsa BIM", "cupo": 10.0, "precio": 2.31}, {"barcode": "7441029510539", "codigo": 504789, "producto": "Vital Frutic 600g Bolsa BIM", "cupo": 10.0, "precio": 2.31}, {"barcode": "7441029511352", "codigo": 504808, "producto": "Sponch Fresa 4p 240g ME MAR", "cupo": 16.0, "precio": 1.22}, {"barcode": "74001200", "codigo": 504817, "producto": "Sponch Fresa 90g Flow MAR", "cupo": 50.0, "precio": 0.52}, {"barcode": "7441029516951", "codigo": 504818, "producto": "Sponch Smore 90g Flow MAR", "cupo": 50.0, "precio": 0.52}, {"barcode": "7441029520781", "codigo": 504948, "producto": "Salmas Chia Linaza 8p 144g SAN", "cupo": 20.0, "precio": 2.28}, {"barcode": "7441029520491", "codigo": 504951, "producto": "Croissant 1p 400g ME BIM", "cupo": 8.0, "precio": 3.57}, {"barcode": "7441029522204", "codigo": 504970, "producto": "Rosquita Yuca", "cupo": 8.0, "precio": 3.33}, {"barcode": "7441029521207", "codigo": 505136, "producto": "Rapiditas Mediterrenea 1p 250g Bolsa BIM", "cupo": 27.0, "precio": 1.98}, {"barcode": "7441029520705", "codigo": 505143, "producto": "Pan Oatnut Bread 1p 680g ORO", "cupo": 10.0, "precio": 2.71}, {"barcode": "7441029520712", "codigo": 505144, "producto": "Pan Healthy Multigrain 1p 680g ORO", "cupo": 10.0, "precio": 2.71}, {"barcode": "7441029500400", "codigo": 505252, "producto": "Pan Tostado Clasica 1p 680g", "cupo": 42.0, "precio": 1.93}, {"barcode": "7441029522228", "codigo": 505543, "producto": "Pingüino Cookies and Cream", "cupo": 48.0, "precio": 0.89}, {"barcode": "7441029522693", "codigo": 505732, "producto": "INTEGRAL CERO CERO", "cupo": 12.0, "precio": 2.13}, {"barcode": "7441029525137", "codigo": 506207, "producto": "Galleta Arroz Mediterranea", "cupo": 10.0, "precio": 1.94}, {"barcode": "7441029523799", "codigo": 505830, "producto": "Almohada Cereza 1p 110g FLOW ID", "cupo": 27.0, "precio": 0.81}, {"barcode": "7441029523805", "codigo": 505831, "producto": "Almohada Pasas 1p 110g FLOW ID", "cupo": 27.0, "precio": 0.81}, {"barcode": "7441029524505", "codigo": 506054, "producto": "Principe Lemon Drops 6p 228g", "cupo": 20.0, "precio": 1.48}, {"barcode": "7441029524512", "codigo": 506055, "producto": "Principe choco Drops 6p 228g", "cupo": 20.0, "precio": 1.48}, {"barcode": "7441029523812", "codigo": 505832, "producto": "Dinner Roll Ideal", "cupo": 10.0, "precio": 2.25}, {"barcode": "7443000400068", "codigo": 506255, "producto": "Palo De Queso 1p 140g zar", "cupo": 8.0, "precio": 1.63}, {"barcode": "7443000400396", "codigo": 506261, "producto": "Empanada Piña 300g zar", "cupo": 15.0, "precio": 2.33}, {"barcode": "7443000400211", "codigo": 506263, "producto": "Costilla guayaba 240g zar", "cupo": 21.0, "precio": 2.02}, {"barcode": "7443000400976", "codigo": 506275, "producto": "Palmeritas Empaque 265g zar", "cupo": 18.0, "precio": 1.94}, {"barcode": "7443000400174", "codigo": 506258, "producto": "Arrollado Paquete 1p 290g FLOW", "cupo": 20.0, "precio": 2.71}];
+const TEMPLATE_META = {"year": 2026, "company": "BIMBO DE PANAMÁ, S.A.", "title": "HOJA DE PEDIDO ELECTRONICA", "headerA": "Codigos de barra", "headerB": "CODIGO", "headerC": "PRODUCTO", "headerD": "CUPO", "headerE": "PRECIO", "headerF": "PEDIDO PIEZA", "count": 113};
+
+var state       = PRODUCTS.map(function(p){ return Object.assign({},p,{pedido:0}); });
+var onlySelected = false;
+var activeBC     = null;
+
+var listEl      = document.getElementById('list');
+var searchEl    = document.getElementById('search');
+var fechaEl     = document.getElementById('fecha');
+var qtyModal    = document.getElementById('qtyModal');
+var modalInput  = document.getElementById('modalInput');
+
+
+
+function money(n){ return new Intl.NumberFormat('es-PA',{style:'currency',currency:'USD'}).format(Number(n)||0); }
+function fmt(n)  { return new Intl.NumberFormat('es-PA').format(Number(n)||0); }
+
+// ── Modal ────────────────────────────────────────────
+function openModal(bc){
+  var item = state.find(function(x){ return String(x.barcode)===String(bc); });
+  if(!item) return;
+  activeBC = bc;
+  document.getElementById('modalSub').textContent  = 'Cod: '+item.codigo+'  Precio: '+money(item.precio)+'  Cupo: '+fmt(item.cupo);
+  document.getElementById('modalName').textContent = item.producto;
+  modalInput.value = item.pedido>0 ? String(item.pedido) : '';
+  qtyModal.classList.add('open');
+  setTimeout(function(){ modalInput.focus(); modalInput.select(); }, 80);
+}
+function closeModal(){ qtyModal.classList.remove('open'); activeBC=null; }
+function confirmModal(){
+  if(!activeBC) return;
+  var val = Math.max(0, parseInt(modalInput.value,10)||0);
+  var item = state.find(function(x){ return String(x.barcode)===String(activeBC); });
+  if(item){ item.pedido=val; updateCard(activeBC); }
+  closeModal();
+}
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+document.getElementById('modalOk').addEventListener('click', confirmModal);
+modalInput.addEventListener('keydown', function(e){ if(e.key==='Enter') confirmModal(); });
+qtyModal.addEventListener('click', function(e){ if(e.target===qtyModal) closeModal(); });
+
+// ── Update card without full re-render ───────────────
+function updateCard(bc){
+  var item = state.find(function(x){ return String(x.barcode)===String(bc); });
+  if(!item) return;
+  var p = Number(item.pedido||0);
+  var btn = document.querySelector('.qty-display[data-barcode="'+bc+'"]');
+  if(btn) btn.textContent = p;
+  var lm = document.querySelector('.line-money[data-barcode="'+bc+'"]');
+  if(lm) lm.textContent = money(p*item.precio);
+  var card = btn ? btn.closest('.card') : null;
+  if(card){
+    var st = card.querySelector('.line-total strong');
+    if(st) st.textContent = fmt(p);
+  }
+  updateStats(getFiltered());
+}
+
+// ── Filter ───────────────────────────────────────────
+function getFiltered(){
+  var q = searchEl.value.trim().toLowerCase();
+  var rows = state;
+  if(q) rows = rows.filter(function(r){
+    return String(r.barcode).toLowerCase().indexOf(q)>=0 ||
+           String(r.codigo).toLowerCase().indexOf(q)>=0  ||
+           String(r.producto).toLowerCase().indexOf(q)>=0;
+  });
+  if(onlySelected) rows = rows.filter(function(r){ return Number(r.pedido||0)>0; });
+  return rows;
+}
+
+// ── Stats ─────────────────────────────────────────────
+function updateStats(rows){
+  var sel = state.filter(function(x){ return Number(x.pedido)>0; });
+  var pcs = sel.reduce(function(a,b){ return a+Number(b.pedido||0); },0);
+  var amt = sel.reduce(function(a,b){ return a+Number(b.pedido||0)*Number(b.precio||0); },0);
+  document.getElementById('statItems').textContent   = fmt(sel.length);
+  document.getElementById('statPieces').textContent  = fmt(pcs);
+  document.getElementById('statAmount').textContent  = money(amt);
+  document.getElementById('statVisible').textContent = fmt(rows.length);
+  document.getElementById('footSummary').textContent = fmt(pcs)+' piezas · '+money(amt);
+}
+
+// ── Render ────────────────────────────────────────────
+function render(){
+  var rows = getFiltered();
+  listEl.className = window.innerWidth>=700 ? 'list two-col' : 'list';
+  var html = '';
+  for(var i=0;i<rows.length;i++){
+    var r = rows[i];
+    html += '<div class="card">';
+    html += '<div class="topline"><div class="product">'+r.producto+'</div><div class="price">'+money(r.precio)+'</div></div>';
+    html += '<div class="meta">Barra: <strong>'+r.barcode+'</strong><br>Código: <strong>'+r.codigo+'</strong> · Cupo: <strong>'+fmt(r.cupo)+'</strong></div>';
+    html += '<div class="row">';
+    html += '<div class="stepper">';
+    html += '<button type="button" class="step-btn" data-action="minus" data-barcode="'+r.barcode+'">−</button>';
+    html += '<button type="button" class="qty-display" data-action="edit" data-barcode="'+r.barcode+'">'+(r.pedido||0)+'</button>';
+    html += '<button type="button" class="step-btn" data-action="plus" data-barcode="'+r.barcode+'">+</button>';
+    html += '</div>';
+    html += '<div class="qty-box"><label>Total línea</label><div class="line-money" data-barcode="'+r.barcode+'">'+money((r.pedido||0)*r.precio)+'</div></div>';
+    html += '</div>';
+    html += '<div class="line-total"><span>Piezas pedidas</span><strong>'+fmt(r.pedido||0)+'</strong></div>';
+    html += '</div>';
+  }
+  listEl.innerHTML = html;
+
+  listEl.querySelectorAll('button[data-action]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var bc  = btn.dataset.barcode;
+      var act = btn.dataset.action;
+      if(act==='edit'){ openModal(bc); return; }
+      var item = state.find(function(x){ return String(x.barcode)===String(bc); });
+      if(!item) return;
+      if(act==='plus')  item.pedido = Number(item.pedido||0)+1;
+      if(act==='minus') item.pedido = Math.max(0,Number(item.pedido||0)-1);
+      updateCard(bc);
+    });
+  });
+  updateStats(rows);
+}
+
+// ── Descargar CSV/Excel ───────────────────────────────
+function exportExcel(){
+  var merc  = document.getElementById('mercaderista').value||'pedido';
+  var ruta  = document.getElementById('ruta').value||'';
+  var cli   = document.getElementById('cliente').value||'';
+  var dia   = document.getElementById('fecha').value||'';
+  function esc(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }
+  var lines = [];
+  lines.push([TEMPLATE_META.year,TEMPLATE_META.company,'','','','SUGERIDO','TOTAL'].map(esc).join(','));
+  lines.push(['Mercaderista',merc,'Ruta',ruta,'Cliente',cli,'Dia',dia].map(esc).join(','));
+  lines.push('');
+  lines.push([TEMPLATE_META.headerA,TEMPLATE_META.headerB,TEMPLATE_META.headerC,TEMPLATE_META.headerD,TEMPLATE_META.headerE,'PEDIDO','TOTAL'].map(esc).join(','));
+  state.forEach(function(r){
+    var p=Number(r.pedido||0);
+    lines.push([r.barcode,r.codigo,r.producto,Number(r.cupo||0),Number(r.precio||0),p,(p*Number(r.precio||0)).toFixed(2)].map(esc).join(','));
+  });
+  var csv = String.fromCharCode(65279)+lines.join('\n');
+  var blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = merc.replace(/[^a-z0-9]+/gi,'_')+'_pedido.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },1000);
+}
+
+// ── PDF (vista previa en página) ──────────────────────
+function exportPdf(){
+  var merc  = document.getElementById('mercaderista').value||'Mercaderista';
+  var ruta  = document.getElementById('ruta').value||'';
+  var cli   = document.getElementById('cliente').value||'';
+  var dia   = document.getElementById('fecha').value||'';
+  var sel   = state.filter(function(r){ return Number(r.pedido||0)>0; });
+  var pcs   = sel.reduce(function(a,b){ return a+Number(b.pedido||0); },0);
+  var amt   = sel.reduce(function(a,b){ return a+Number(b.pedido||0)*Number(b.precio||0); },0);
+  var trs='';
+  state.forEach(function(r){
+    var p=Number(r.pedido||0);
+    var bg=p>0?' style="background:#f0fdf4"':'';
+    trs+='<tr'+bg+'><td>'+r.barcode+'</td><td>'+r.codigo+'</td><td style="text-align:left">'+r.producto+'</td><td>'+r.cupo+'</td><td>$'+Number(r.precio).toFixed(2)+'</td><td><b>'+(p||'')+'</b></td><td>'+(p?'$'+(p*Number(r.precio||0)).toFixed(2):'')+'</td></tr>';
+  });
+  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedido '+merc+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;font-size:11px;margin:16px}h2{margin:0 0 4px}'
+    +'.info{margin-bottom:10px;color:#555}table{width:100%;border-collapse:collapse}'
+    +'th{background:#5b21b6;color:#fff;padding:6px 4px;text-align:center}'
+    +'td{padding:5px 4px;border-bottom:1px solid #e5e7eb;text-align:center}'
+    +'.tot td{font-weight:800;background:#ede9fe;border-top:2px solid #5b21b6}'
+    +'@media print{.noprint{display:none}}</style></head><body>'
+    +'<h2>HOJA DE PEDIDO — '+TEMPLATE_META.company+'</h2>'
+    +'<div class="info"><b>Mercaderista:</b> '+merc+' &nbsp;|&nbsp; <b>Ruta:</b> '+ruta+' &nbsp;|&nbsp; <b>Cliente:</b> '+cli+' &nbsp;|&nbsp; <b>Día:</b> '+dia+'</div>'
+    +'<p><b>'+sel.length+' productos</b> &nbsp; <b>'+pcs+' piezas</b> &nbsp; Total: <b>$'+amt.toFixed(2)+'</b></p>'
+    +'<button class="noprint" onclick="window.print()" style="margin-bottom:12px;padding:8px 20px;background:#5b21b6;color:#fff;border:none;border-radius:8px;cursor:pointer">Imprimir / Guardar PDF</button>'
+    +'<table><thead><tr><th>Barra</th><th>Código</th><th>Producto</th><th>Cupo</th><th>Precio</th><th>Pedido</th><th>Total</th></tr></thead>'
+    +'<tbody>'+trs+'</tbody>'
+    +'<tfoot><tr class="tot"><td colspan="5">TOTAL</td><td>'+pcs+'</td><td>$'+amt.toFixed(2)+'</td></tr></tfoot>'
+    +'</table></body></html>';
+  var blob=new Blob([h],{type:'text/html;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var win=window.open(url,'_blank');
+  if(!win){
+    var a=document.createElement('a');
+    a.href=url; a.download=merc.replace(/[^a-z0-9]+/gi,'_')+'_pedido.html';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },1000);
+  }
+}
+
+// ── Mostrar resumen para copiar ───────────────────────
+function shareWhatsApp(){
+  var merc  = document.getElementById('mercaderista').value || 'Sin nombre';
+  var ruta  = document.getElementById('ruta').value  || '';
+  var cli   = document.getElementById('cliente').value || '';
+  var fecha = document.getElementById('fecha').value || '';
+  var sel   = state.filter(function(r){ return Number(r.pedido||0)>0; });
+  var pcs   = sel.reduce(function(a,b){ return a+Number(b.pedido||0); }, 0);
+  var amt   = sel.reduce(function(a,b){ return a+Number(b.pedido||0)*Number(b.precio||0); }, 0);
+
+  if(sel.length === 0){ alert('No hay productos en el pedido.'); return; }
+
+  var lines = [];
+  lines.push('PEDIDO — ' + TEMPLATE_META.company);
+  lines.push('');
+  lines.push('Mercaderista: ' + merc);
+  if(ruta)  lines.push('Ruta: ' + ruta);
+  if(cli)   lines.push('Cliente: ' + cli);
+  if(fecha) lines.push('Fecha: ' + fecha);
+  lines.push('');
+  sel.forEach(function(r){
+    var p = Number(r.pedido||0);
+    lines.push(r.producto + ' x' + p + ' = $' + (p*Number(r.precio||0)).toFixed(2));
+  });
+  lines.push('');
+  lines.push('Total piezas: ' + pcs);
+  lines.push('TOTAL: $' + amt.toFixed(2));
+
+  var txt = lines.join('\n');
+  document.getElementById('shareText').value = txt;
+  document.getElementById('shareOverlay').style.display = 'flex';
+  // auto-select all
+  setTimeout(function(){
+    var ta = document.getElementById('shareText');
+    ta.focus(); ta.select();
+    // try clipboard
+    try { document.execCommand('copy'); document.getElementById('copyMsg').style.display='block'; } catch(e){}
+  }, 100);
+}
+
+// ── Upload CSV ────────────────────────────────────────
+document.getElementById('btnUpload').addEventListener('click', function(){
+  document.getElementById('uploadFile').click();
+});
+
+document.getElementById('uploadFile').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var status = document.getElementById('uploadStatus');
+  status.textContent = 'Leyendo...';
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      var text = ev.target.result;
+      var lines = text.split('');
+      if(lines.length<2){ status.style.color='#f87171'; status.textContent='Archivo vacío.'; return; }
+
+      function parseLine(line){
+        var res=[],cur='',inQ=false;
+        for(var i=0;i<line.length;i++){
+          var ch=line[i];
+          if(ch==='"'){ if(inQ&&line[i+1]==='"'){ cur+='"'; i++; } else inQ=!inQ; }
+          else if(ch===','&&!inQ){ res.push(cur.trim()); cur=''; }
+          else cur+=ch;
+        }
+        res.push(cur.trim());
+        return res;
+      }
+
+      var headers = parseLine(lines[0]);
+      function findCol(list){
+        for(var i=0;i<list.length;i++){
+          var idx=headers.findIndex(function(h){ return h.replace(/"/g,'').trim().toLowerCase()===list[i].toLowerCase(); });
+          if(idx>=0) return idx;
+        }
+        return -1;
+      }
+
+      var iBar  = findCol(['codigos de barra','barcode','barra','ean','cod barra']);
+      var iCod  = findCol(['codigo','código','cod','code']);
+      var iProd = findCol(['producto','product','descripcion','descripción','nombre']);
+      var iCupo = findCol(['cupo','sugerido']);
+      var iPre  = findCol(['precio','price','pvp']);
+
+      if(iProd<0){ status.style.color='#f87171'; status.textContent='No se encontró columna Producto.'; return; }
+
+      var nuevos=[];
+      for(var i=1;i<lines.length;i++){
+        if(!lines[i].trim()) continue;
+        var cols=parseLine(lines[i]);
+        var prod=(cols[iProd]||'').replace(/^"|"$/g,'').trim();
+        if(!prod) continue;
+        nuevos.push({
+          barcode : iBar>=0  ? (cols[iBar]||'').replace(/^"|"$/g,'').trim() : '',
+          codigo  : iCod>=0  ? (cols[iCod]||'').replace(/^"|"$/g,'').trim() : '',
+          producto: prod,
+          cupo    : iCupo>=0 ? parseFloat((cols[iCupo]||'0').replace(/[^0-9.]/g,''))||0 : 0,
+          precio  : iPre>=0  ? parseFloat((cols[iPre] ||'0').replace(/[^0-9.]/g,''))||0 : 0,
+          pedido  : 0
+        });
+      }
+
+      if(!nuevos.length){ status.style.color='#f87171'; status.textContent='Sin productos válidos.'; return; }
+
+      state = nuevos;
+      onlySelected = false;
+      document.getElementById('btnOnly').textContent = 'Solo pedidos';
+      document.getElementById('badgeCount').textContent = nuevos.length+' productos';
+      status.style.color='#86efac';
+      status.textContent = '✓ '+nuevos.length+' productos cargados ('+file.name+')';
+      render();
+    }catch(err){
+      status.style.color='#f87171';
+      status.textContent='Error: '+err.message;
+    }
+    e.target.value='';
+  };
+  reader.readAsText(file,'UTF-8');
+});
+
+// ── Listeners ─────────────────────────────────────────
+searchEl.addEventListener('input', render);
+document.getElementById('btnClear').addEventListener('click', function(){
+  state = state.map(function(r){ return Object.assign({},r,{pedido:0}); }); render();
+});
+document.getElementById('btnOnly').addEventListener('click', function(e){
+  onlySelected=!onlySelected; e.target.textContent=onlySelected?'Ver todos':'Solo pedidos'; render();
+});
+document.getElementById('btnExcelTop').addEventListener('click', exportExcel);
+document.getElementById('btnExcelBot').addEventListener('click', exportExcel);
+document.getElementById('btnPdfTop').addEventListener('click', exportPdf);
+document.getElementById('btnPdfBot').addEventListener('click', exportPdf);
+document.getElementById('btnShare').addEventListener('click', shareWhatsApp);
+document.getElementById('btnShareBot').addEventListener('click', shareWhatsApp);
+window.addEventListener('resize', render);
+
+render();
+</script>
+      <div style="display:flex;gap:8px;">
+        <button onclick="window.print()" style="background:#5b21b6;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;">Imprimir / PDF</button>
+        <button onclick="document.getElementById('previewOverlay').style.display='none'" style="background:#36384a;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;">Cerrar</button>
+      </div>
+    </div>
+    <div id="previewContent"></div>
+  </div>
+</div>
+
+<!-- Share overlay -->
+<div id="shareOverlay" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.9);align-items:flex-end;justify-content:center;">
+  <div style="background:#1b1b25;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:600px;">
+    <div style="font-weight:800;font-size:17px;margin-bottom:6px;">Resumen del pedido</div>
+    <div style="font-size:13px;color:#aaa;margin-bottom:12px;">Mantén presionado el texto y elige <b>Copiar todo</b>, luego pégalo en WhatsApp.</div>
+    <div id="copyMsg" style="display:none;background:#166534;color:#bbf7d0;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;margin-bottom:10px;">✓ Texto copiado al portapapeles</div>
+    <textarea id="shareText" readonly style="width:100%;height:220px;background:#10121a;color:#e2e8f0;border:1px solid #374151;border-radius:12px;padding:12px;font-size:13px;line-height:1.6;resize:none;font-family:monospace;"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+      <button onclick="var ta=document.getElementById('shareText');ta.select();try{document.execCommand('copy');document.getElementById('copyMsg').style.display='block';}catch(e){}" style="background:#5b21b6;border-radius:14px;min-height:48px;font-size:15px;font-weight:800;color:#fff;border:none;cursor:pointer;">📋 Copiar</button>
+      <button onclick="document.getElementById('shareOverlay').style.display='none';document.getElementById('copyMsg').style.display='none';" style="background:#36384a;border-radius:14px;min-height:48px;font-size:15px;font-weight:800;color:#fff;border:none;cursor:pointer;">Cerrar</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
