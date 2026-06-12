@@ -87,6 +87,37 @@
       .stats{grid-template-columns:repeat(4,1fr);}
       .list.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     }
+    /* Botón subir arriba */
+    #btnScrollTop{
+      position:fixed;
+      right:18px;
+      bottom:calc(80px + env(safe-area-inset-bottom));
+      z-index:60;
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      background:linear-gradient(135deg,#5b21b6,#c026d3);
+      color:#fff;
+      font-size:22px;
+      line-height:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 4px 16px rgba(139,92,246,.45);
+      cursor:pointer;
+      border:none;
+      min-height:unset;
+      padding:0;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .25s, transform .25s;
+      transform:translateY(10px);
+    }
+    #btnScrollTop.visible{
+      opacity:1;
+      pointer-events:auto;
+      transform:translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -148,6 +179,8 @@
     <div class="modal-btns"><button class="modal-cancel" id="modalCancel">Cancelar</button><button class="modal-ok" id="modalOk">Confirmar</button></div>
   </div>
 </div>
+<!-- Botón subir arriba -->
+<button id="btnScrollTop" aria-label="Subir arriba" title="Subir arriba">&#8679;</button>
 <script>
 const TEMPLATE_META = {
   headers: ['Codigos de barra','CODIGO','CATEGORIA','PRODUCTO','CUPO','PRECIO','PEDIDO PIEZA']
@@ -251,6 +284,20 @@ document.querySelectorAll('.theme-dot').forEach(dot=>{
 try{ const saved=localStorage.getItem('pedido_theme'); if(saved!==null) applyTheme(saved); }catch(e){}
 buildCatFilter();
 render();
+// ── Botón subir arriba ──────────────────────────────
+(function(){
+  const btn = document.getElementById('btnScrollTop');
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 300){
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }, {passive:true});
+  btn.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+})();
 </script>
 </body>
 </html>
