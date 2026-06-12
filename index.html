@@ -30,8 +30,9 @@
     .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px;}
     .stat .n{font-size:22px;font-weight:800;color:#d8b4fe;}
     .stat .l{font-size:12px;color:var(--muted);margin-top:4px;}
-    .tools{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 82%,rgba(15,15,20,0));padding-bottom:8px;margin-bottom:8px;}
-    .search{width:100%;height:46px;padding:12px 14px;border-radius:14px;border:1px solid #303046;background:#10121a;color:#fff;font-size:16px;margin-bottom:10px;}
+    .tools{padding-bottom:4px;margin-bottom:8px;}
+    .search-sticky-wrap{position:sticky;top:0;z-index:30;padding:10px 0 6px;margin-bottom:2px;background:var(--bg);}
+    .search{width:100%;height:46px;padding:12px 14px;border-radius:14px;border:1px solid #303046;background:#10121a;color:#fff;font-size:16px;margin-bottom:0;}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
     button{border:none;border-radius:14px;min-height:46px;padding:10px 12px;font-weight:800;font-size:14px;color:#fff;cursor:pointer;}
     .btn-clear{background:#36384a;}
@@ -52,7 +53,9 @@
     .cat-btn.active{background:linear-gradient(135deg,#5b21b6,#c026d3);color:#fff;border-color:transparent;}
     .list{display:flex;flex-direction:column;gap:10px;}
     .category-title{font-size:12px;color:#d8b4fe;text-transform:uppercase;font-weight:800;letter-spacing:.6px;margin:8px 0 0;}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;transition:border-color .2s,background .2s;}
+    .card.has-order{border-color:#7c3aed;background:linear-gradient(135deg,rgba(91,33,182,.18) 0%,rgba(124,58,237,.08) 100%);}
+    .card.has-order .product{color:#e9d5ff;}
     .topline{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px;}
     .product{font-weight:800;font-size:15px;line-height:1.25;}
     .price{font-weight:800;color:#c4b5fd;white-space:nowrap;font-size:14px;}
@@ -105,8 +108,8 @@
     <div class="stat"><div class="n" id="statAmount">$0.00</div><div class="l">Total estimado</div></div>
     <div class="stat"><div class="n" id="statVisible">0</div><div class="l">Visibles</div></div>
   </div>
-  <div class="tools">
-    <input id="search" class="search" placeholder="Buscar producto, código, barra o categoría...">
+  <div class="search-sticky-wrap"><input id="search" class="search" placeholder="Buscar producto, código, barra o categoría..."></div>
+    <div class="tools">
     <div class="actions">
       <button class="btn-clear" id="btnClear">Limpiar</button>
       <button class="btn-only" id="btnOnly">Solo pedidos</button>
@@ -178,7 +181,7 @@ qtyModal.addEventListener('click', e=>{ if(e.target===qtyModal) closeModal(); })
 function getFiltered(){ const q=searchEl.value.trim().toLowerCase(); let rows=state; if(activeCat) rows=rows.filter(r=>(r.categoria||'').trim()===activeCat); if(q){ rows=rows.filter(r=>String(r.barcode).toLowerCase().includes(q)||String(r.codigo).toLowerCase().includes(q)||String(r.categoria).toLowerCase().includes(q)||String(r.producto).toLowerCase().includes(q)); } if(onlySelected) rows=rows.filter(r=>Number(r.pedido||0)>0); return rows; }
 function updateStats(rows){ const sel=state.filter(x=>Number(x.pedido)>0); const pcs=sel.reduce((a,b)=>a+Number(b.pedido||0),0); const amt=sel.reduce((a,b)=>a+Number(b.pedido||0)*Number(b.precio||0),0); document.getElementById('statItems').textContent=fmt(sel.length); document.getElementById('statPieces').textContent=fmt(pcs); document.getElementById('statAmount').textContent=money(amt); document.getElementById('statVisible').textContent=fmt(rows.length); document.getElementById('footSummary').textContent=fmt(pcs)+' piezas · '+money(amt); document.getElementById('badgeCount').textContent=fmt(state.length)+' productos'; }
 function updateCard(bc){ const item=state.find(x=>barcodeKey(x.barcode)===barcodeKey(bc)); if(!item) return; const p=Number(item.pedido||0); render(); updateStats(getFiltered()); }
-function render(){ const rows=getFiltered(); listEl.className=window.innerWidth>=700?'list two-col':'list'; let html=''; rows.forEach(r=>{ html += '<div class="card"><div class="topline"><div class="product">'+safe(r.producto)+'</div><div class="price">'+money(r.precio)+'</div></div><div class="meta">Barra: <strong>'+safe(r.barcode)+'</strong><br>Código: <strong>'+safe(r.codigo)+'</strong> · Cupo: <strong>'+fmt(r.cupo)+'</strong></div><div class="row"><div class="stepper"><button type="button" class="step-btn" data-action="minus" data-barcode="'+safe(r.barcode)+'">−</button><button type="button" class="qty-display" data-action="edit" data-barcode="'+safe(r.barcode)+'">'+Number(r.pedido||0)+'</button><button type="button" class="step-btn" data-action="plus" data-barcode="'+safe(r.barcode)+'">+</button></div><div class="qty-box"><label>Total línea</label><div class="line-money" data-barcode="'+safe(r.barcode)+'">'+money((Number(r.pedido||0))*Number(r.precio||0))+'</div></div></div><div class="line-total"><span>Piezas pedidas</span><strong>'+fmt(r.pedido||0)+'</strong></div></div>'; }); listEl.innerHTML=html; listEl.querySelectorAll('button[data-action]').forEach(btn=>{ btn.addEventListener('click',()=>{ const bc=btn.dataset.barcode; const act=btn.dataset.action; if(act==='edit') return openModal(bc); const item=state.find(x=>barcodeKey(x.barcode)===barcodeKey(bc)); if(!item) return; if(act==='plus') item.pedido=Number(item.pedido||0)+1; if(act==='minus') item.pedido=Math.max(0,Number(item.pedido||0)-1); render(); }); }); updateStats(rows); }
+function render(){ const rows=getFiltered(); listEl.className=window.innerWidth>=700?'list two-col':'list'; let html=''; rows.forEach(r=>{ const hasOrd=Number(r.pedido||0)>0; html += '<div class="card'+(hasOrd?' has-order':'')+'"><div class="topline"><div class="product">'+safe(r.producto)+'</div><div class="price">'+money(r.precio)+'</div></div><div class="meta">Barra: <strong>'+safe(r.barcode)+'</strong><br>Código: <strong>'+safe(r.codigo)+'</strong> · Cupo: <strong>'+fmt(r.cupo)+'</strong></div><div class="row"><div class="stepper"><button type="button" class="step-btn" data-action="minus" data-barcode="'+safe(r.barcode)+'">−</button><button type="button" class="qty-display" data-action="edit" data-barcode="'+safe(r.barcode)+'">'+Number(r.pedido||0)+'</button><button type="button" class="step-btn" data-action="plus" data-barcode="'+safe(r.barcode)+'">+</button></div><div class="qty-box"><label>Total línea</label><div class="line-money" data-barcode="'+safe(r.barcode)+'">'+money((Number(r.pedido||0))*Number(r.precio||0))+'</div></div></div><div class="line-total"><span>Piezas pedidas</span><strong>'+fmt(r.pedido||0)+'</strong></div></div>'; }); listEl.innerHTML=html; listEl.querySelectorAll('button[data-action]').forEach(btn=>{ btn.addEventListener('click',()=>{ const bc=btn.dataset.barcode; const act=btn.dataset.action; if(act==='edit') return openModal(bc); const item=state.find(x=>barcodeKey(x.barcode)===barcodeKey(bc)); if(!item) return; if(act==='plus') item.pedido=Number(item.pedido||0)+1; if(act==='minus') item.pedido=Math.max(0,Number(item.pedido||0)-1); render(); }); }); updateStats(rows); }
 function exportExcel(){
   const pedidos=state.filter(r=>Number(r.pedido||0)>0);
   if(!pedidos.length){ alert('No hay productos en el pedido.'); return; }
