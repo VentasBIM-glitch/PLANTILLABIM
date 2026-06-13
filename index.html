@@ -3,18 +3,38 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Plantilla de Pedidos</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <style>
+  <title>Pedidos Nutri-Americas</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#5b21b6"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Pedidos NA"/>
+  <link rel="apple-touch-icon" href="icon.svg"/>
+    <style>
     :root{--bg:#0f0f14;--panel:#15151d;--line:#2a2a38;--text:#fff;--muted:#b7b7c9;--ok:#86efac;--danger:#f87171;--radius:16px;--accent1:#5b21b6;--accent2:#8b5cf6;--accent3:#c026d3;}
     /* Theme: light */
     body.theme-light{--bg:#f1f5f9;--panel:#ffffff;--line:#e2e8f0;--text:#0f172a;--muted:#64748b;}
-    /* Theme: blue */
-    body.theme-blue{--bg:#0a0f1e;--panel:#111827;--line:#1e3a5f;--text:#e0f2fe;--muted:#7dd3fc;--accent1:#0369a1;--accent2:#0ea5e9;--accent3:#38bdf8;}
-    /* Theme: green */
-    body.theme-green{--bg:#052e16;--panel:#0f2318;--line:#14532d;--text:#dcfce7;--muted:#86efac;--accent1:#15803d;--accent2:#22c55e;--accent3:#4ade80;}
-    /* Theme: orange */
-    body.theme-orange{--bg:#1c0a00;--panel:#1f1208;--line:#431407;--text:#fff7ed;--muted:#fdba74;--accent1:#c2410c;--accent2:#ea580c;--accent3:#fb923c;}
+    body.theme-light .search{background:#e2e8f0;border-color:#c7cad4;color:#0f172a;}
+    .search-sticky-wrap{position:sticky;top:0;z-index:30;padding:8px 0 4px;background:var(--bg);}
+    .card.has-order{border-color:#7c3aed;background:linear-gradient(135deg,rgba(91,33,182,.18),rgba(124,58,237,.08));}
+    .card.has-order .product{color:#e9d5ff;}
+    .scroll-top{position:fixed;bottom:90px;right:16px;z-index:60;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#5b21b6,#8b5cf6);color:#fff;font-size:22px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(91,33,182,.5);display:none;align-items:center;justify-content:center;}
+    .scroll-top.visible{display:flex;}
+    body.theme-light .search::placeholder{color:#94a3b8;}
+    body.theme-light .field input,body.theme-light .field select{background:#e2e8f0;border-color:#c7cad4;color:#0f172a;}
+    body.theme-light .card{background:#fff;}
+    body.theme-light .card.has-order{border-color:#7c3aed;border-width:2px;background:linear-gradient(135deg,rgba(109,40,217,.15),rgba(124,58,237,.1));}
+    body.theme-light .card.has-order .product{color:#5b21b6;font-weight:900;}
+    body.theme-light .card.has-order .price{color:#6d28d9;}
+    body.theme-light .card.has-order .meta{color:#374151;}
+    body.theme-light .card.has-order .line-total{color:#374151;}
+    body.theme-light .card.has-order .line-total strong{color:#5b21b6;}
+    body.theme-light .step-btn{background:#e2e8f0;color:#0f172a;}
+    body.theme-light .qty-display{background:#e2e8f0;color:#0f172a;}
+    body.theme-light .meta{color:#475569;}
+    body.theme-light .footbar{background:rgba(241,245,249,.97);}
+    body.theme-light .search-sticky-wrap{background:#f1f5f9;}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);}
     .app{max-width:980px;margin:0 auto;padding:14px 14px 110px;}
@@ -31,8 +51,12 @@
     .stat .n{font-size:22px;font-weight:800;color:#d8b4fe;}
     .stat .l{font-size:12px;color:var(--muted);margin-top:4px;}
     .tools{padding-bottom:4px;margin-bottom:8px;}
-    .search-sticky-wrap{position:sticky;top:0;z-index:30;padding:10px 0 6px;margin-bottom:2px;background:var(--bg);}
-    .search{width:100%;height:46px;padding:12px 14px;border-radius:14px;border:1px solid #303046;background:#10121a;color:#fff;font-size:16px;margin-bottom:0;}
+    .search{width:100%;height:46px;padding:12px 14px;border-radius:14px;border:1px solid #303046;background:#10121a;color:#fff;font-size:16px;margin-bottom:10px;}
+    .search-sticky-wrap{position:sticky;top:0;z-index:30;padding:8px 0 4px;background:var(--bg);}
+    .card.has-order{border-color:#7c3aed;background:linear-gradient(135deg,rgba(91,33,182,.18),rgba(124,58,237,.08));}
+    .card.has-order .product{color:#e9d5ff;}
+    .scroll-top{position:fixed;bottom:90px;right:16px;z-index:60;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#5b21b6,#8b5cf6);color:#fff;font-size:22px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(91,33,182,.5);display:none;align-items:center;justify-content:center;}
+    .scroll-top.visible{display:flex;}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
     button{border:none;border-radius:14px;min-height:46px;padding:10px 12px;font-weight:800;font-size:14px;color:#fff;cursor:pointer;}
     .btn-clear{background:#36384a;}
@@ -40,13 +64,14 @@
     .btn-excel{background:linear-gradient(135deg,#5b21b6,#8b5cf6);}
     .btn-pdf{background:linear-gradient(135deg,#b45309,#d97706);}
     .btn-upload{width:100%;background:#1a2a1a;color:#86efac;border:1.5px dashed #4ade80;margin-bottom:4px;}
+
     .upload-status{font-size:12px;color:#86efac;min-height:16px;margin-bottom:6px;}
     .smallnote{font-size:11px;color:var(--muted);}
-    .theme-picker{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
-    .theme-dot{width:30px;height:30px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s,border-color .15s;flex-shrink:0;}
-    .theme-dot:hover{transform:scale(1.15);}
-    .theme-dot.active{border-color:#fff;transform:scale(1.1);}
-    .theme-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+    .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:999;background:#22c55e;color:#fff;padding:12px 22px;border-radius:14px;font-size:14px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;opacity:0;pointer-events:none;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    .theme-toggle{display:flex;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;}
+    .theme-toggle button{border:none;border-radius:999px;height:30px;padding:0 12px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:background .15s,color .15s;white-space:nowrap;min-height:unset;}
+    .theme-toggle button.active{background:linear-gradient(135deg,#5b21b6,#8b5cf6);color:#fff;}
     .cat-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none;}
     .cat-scroll::-webkit-scrollbar{display:none;}
     .cat-btn{flex-shrink:0;height:34px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:700;background:#1e1e30;color:#b7b7c9;border:1.5px solid #2a2a40;cursor:pointer;white-space:nowrap;min-height:unset;transition:background .15s,color .15s,border-color .15s;}
@@ -87,44 +112,21 @@
       .stats{grid-template-columns:repeat(4,1fr);}
       .list.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     }
-    /* Botón subir arriba */
-    #btnScrollTop{
-      position:fixed;
-      right:18px;
-      bottom:calc(80px + env(safe-area-inset-bottom));
-      z-index:60;
-      width:48px;
-      height:48px;
-      border-radius:50%;
-      background:linear-gradient(135deg,#5b21b6,#c026d3);
-      color:#fff;
-      font-size:22px;
-      line-height:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 4px 16px rgba(139,92,246,.45);
-      cursor:pointer;
-      border:none;
-      min-height:unset;
-      padding:0;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .25s, transform .25s;
-      transform:translateY(10px);
-    }
-    #btnScrollTop.visible{
-      opacity:1;
-      pointer-events:auto;
-      transform:translateY(0);
-    }
+
+    .install-banner{display:none;position:fixed;bottom:80px;left:12px;right:12px;z-index:100;background:linear-gradient(135deg,#5b21b6,#c026d3);border-radius:16px;padding:14px 16px;align-items:center;gap:12px;box-shadow:0 4px 24px rgba(91,33,182,.5);}
+    .install-banner .ib-icon{font-size:28px;flex-shrink:0;}
+    .install-banner .ib-text{flex:1;}
+    .install-banner .ib-text strong{display:block;font-size:14px;color:#fff;}
+    .install-banner .ib-text span{font-size:11px;color:#e9d5ff;}
+    .install-banner .ib-btn{background:#fff;color:#5b21b6;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:800;min-height:unset;white-space:nowrap;}
+    .install-banner .ib-close{background:transparent;color:#e9d5ff;font-size:20px;min-height:unset;padding:4px 8px;}
   </style>
 </head>
 <body>
 <div class="app">
   <div class="hero">
     <div><h1>PLANTILLA DE PEDIDOS</h1><p>Nutri-Americas S.A.</p></div>
-    <div class="badge" id="badgeCount">0 productos</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;"><div class="badge" id="badgeCount">0 productos</div><div class="theme-toggle" id="themeToggle"><button data-theme="">🌙 Oscuro</button><button data-theme="theme-light">☀️ Claro</button></div></div>
   </div>
   <div class="panel">
     <div class="grid">
@@ -139,7 +141,10 @@
     <div class="stat"><div class="n" id="statAmount">$0.00</div><div class="l">Total estimado</div></div>
     <div class="stat"><div class="n" id="statVisible">0</div><div class="l">Visibles</div></div>
   </div>
-  <div class="search-sticky-wrap"><input id="search" class="search" placeholder="Buscar producto, código, barra o categoría..."></div>
+  <div class="search-sticky-wrap" style="position:relative;">
+    <input id="search" class="search" placeholder="Buscar producto, código, barra o categoría..." style="padding-right:42px;">
+    <button id="btnClearSearch" onclick="document.getElementById('search').value='';document.getElementById('search').dispatchEvent(new Event('input'));this.style.display='none';" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;min-height:unset;padding:4px 6px;line-height:1;border-radius:50%;" title="Limpiar búsqueda">✕</button>
+  </div>
     <div class="tools">
     <div class="actions">
       <button class="btn-clear" id="btnClear">Limpiar</button>
@@ -148,14 +153,6 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
       <button id="btnExcelTop" class="btn-excel">📊 Excel</button>
       <button id="btnPdfTop" class="btn-pdf">📄 PDF</button>
-    </div>
-    <div class="theme-picker">
-      <span class="theme-label">Tema:</span>
-      <div class="theme-dot active" data-theme="" title="Oscuro" style="background:linear-gradient(135deg,#0f0f14,#8b5cf6);" id="dot-dark"></div>
-      <div class="theme-dot" data-theme="theme-light" title="Claro" style="background:linear-gradient(135deg,#f1f5f9,#8b5cf6);" id="dot-light"></div>
-      <div class="theme-dot" data-theme="theme-blue" title="Azul" style="background:linear-gradient(135deg,#0a0f1e,#0ea5e9);" id="dot-blue"></div>
-      <div class="theme-dot" data-theme="theme-green" title="Verde" style="background:linear-gradient(135deg,#052e16,#22c55e);" id="dot-green"></div>
-      <div class="theme-dot" data-theme="theme-orange" title="Naranja" style="background:linear-gradient(135deg,#1c0a00,#ea580c);" id="dot-orange"></div>
     </div>
     <div class="cat-scroll" id="catScroll"></div>
     <input type="file" id="uploadFile" accept=".csv,.xlsx" style="display:none">
@@ -179,8 +176,78 @@
     <div class="modal-btns"><button class="modal-cancel" id="modalCancel">Cancelar</button><button class="modal-ok" id="modalOk">Confirmar</button></div>
   </div>
 </div>
-<!-- Botón subir arriba -->
-<button id="btnScrollTop" aria-label="Subir arriba" title="Subir arriba">&#8679;</button>
+<div class="install-banner" id="installBanner">
+  <div class="ib-icon">📲</div>
+  <div class="ib-text">
+    <strong>Instalar en pantalla de inicio</strong>
+    <span>Acceso rápido sin abrir el navegador</span>
+  </div>
+  <button class="ib-btn" id="btnInstall">Instalar</button>
+  <button class="ib-close" id="installClose">✕</button>
+</div>
+<div class="toast" id="toast"></div>
+<button class="scroll-top" id="scrollTopBtn">&#8593;</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ── CSV/Excel export ── */
+var XLSX_EXPORT = (function(){
+  function esc(v){
+    if(v===null||v===undefined) return '""';
+    var s=String(v);
+    if(s.indexOf(',')>=0||s.indexOf('"')>=0||s.indexOf('\n')>=0)
+      return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }
+  function writeFile(wb, fname){
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var rows=[], maxR=0, maxC=0;
+    Object.keys(ws).forEach(function(k){
+      if(k[0]==='!') return;
+      var m=k.match(/([A-Z]+)(\d+)/); if(!m) return;
+      var c=0; for(var i=0;i<m[1].length;i++) c=c*26+(m[1].charCodeAt(i)-64); c--;
+      var r=parseInt(m[2],10)-1;
+      if(!rows[r]) rows[r]={};
+      rows[r][c]=ws[k].v;
+      if(r>maxR) maxR=r; if(c>maxC) maxC=c;
+    });
+    var lines=[];
+    for(var r=0;r<=maxR;r++){
+      var cols=[];
+      for(var c=0;c<=maxC;c++) cols.push(esc(rows[r]&&rows[r][c]!==undefined?rows[r][c]:''));
+      lines.push(cols.join(','));
+    }
+    var csv='\uFEFF'+lines.join('\r\n');
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=fname.replace(/\.xlsx$/,'.csv');
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },1000);
+  }
+  function colName(n){var s='';n++;while(n>0){s=String.fromCharCode(65+(n-1)%26)+s;n=Math.floor((n-1)/26);}return s;}
+  function book_new(){ return {SheetNames:[],Sheets:{}}; }
+  function book_append_sheet(wb,ws,name){ wb.SheetNames.push(name); wb.Sheets[name]=ws; }
+  function json_to_sheet(data,opts){
+    var headers=(opts&&opts.header)||Object.keys(data[0]||{});
+    var ws={};
+    headers.forEach(function(hdr,c){ ws[colName(c)+'1']={v:hdr,t:'s'}; });
+    data.forEach(function(row,r){
+      headers.forEach(function(hdr,c){
+        var v=row[hdr]; ws[colName(c)+(r+2)]={v:v,t:typeof v==='number'?'n':'s'};
+      });
+    });
+    return ws;
+  }
+  return {
+    writeFile:writeFile,
+    utils:{json_to_sheet:json_to_sheet, book_new:book_new, book_append_sheet:book_append_sheet},
+    book_new:book_new,
+    book_append_sheet:book_append_sheet
+  };
+})();
+</script>
 <script>
 const TEMPLATE_META = {
   headers: ['Codigos de barra','CODIGO','CATEGORIA','PRODUCTO','CUPO','PRECIO','PEDIDO PIEZA']
@@ -206,7 +273,7 @@ function buildCatFilter(){ const seen={}, cats=[]; state.forEach(p=>{ const c=(p
 
 function openModal(bc){ const item = state.find(x => barcodeKey(x.barcode) === barcodeKey(bc)); if(!item) return; activeBC=bc; document.getElementById('modalSub').textContent='Cod: '+item.codigo+' · Precio: '+money(item.precio)+' · Cupo: '+fmt(item.cupo)+' · Cat: '+(item.categoria||'-'); document.getElementById('modalName').textContent=item.producto; modalInput.value=item.pedido>0?String(item.pedido):''; qtyModal.classList.add('open'); setTimeout(()=>{modalInput.focus(); modalInput.select();},60); }
 function closeModal(){ qtyModal.classList.remove('open'); activeBC=null; }
-function confirmModal(){ if(!activeBC) return; const item = state.find(x => barcodeKey(x.barcode)===barcodeKey(activeBC)); if(!item) return closeModal(); item.pedido=Math.max(0,parseInt(modalInput.value,10)||0); updateCard(activeBC); closeModal(); }
+function confirmModal(){ if(!activeBC) return; var item=state.find(function(x){ return barcodeKey(x.barcode)===barcodeKey(activeBC); }); if(!item) return closeModal(); item.pedido=Math.max(0,parseInt(modalInput.value,10)||0); savePedido(); updateCard(activeBC); closeModal(); }
 document.getElementById('modalCancel').addEventListener('click', closeModal);
 document.getElementById('modalOk').addEventListener('click', confirmModal);
 modalInput.addEventListener('keydown', e=>{ if(e.key==='Enter') confirmModal(); });
@@ -214,18 +281,57 @@ qtyModal.addEventListener('click', e=>{ if(e.target===qtyModal) closeModal(); })
 function getFiltered(){ const q=searchEl.value.trim().toLowerCase(); let rows=state; if(activeCat) rows=rows.filter(r=>(r.categoria||'').trim()===activeCat); if(q){ rows=rows.filter(r=>String(r.barcode).toLowerCase().includes(q)||String(r.codigo).toLowerCase().includes(q)||String(r.categoria).toLowerCase().includes(q)||String(r.producto).toLowerCase().includes(q)); } if(onlySelected) rows=rows.filter(r=>Number(r.pedido||0)>0); return rows; }
 function updateStats(rows){ const sel=state.filter(x=>Number(x.pedido)>0); const pcs=sel.reduce((a,b)=>a+Number(b.pedido||0),0); const amt=sel.reduce((a,b)=>a+Number(b.pedido||0)*Number(b.precio||0),0); document.getElementById('statItems').textContent=fmt(sel.length); document.getElementById('statPieces').textContent=fmt(pcs); document.getElementById('statAmount').textContent=money(amt); document.getElementById('statVisible').textContent=fmt(rows.length); document.getElementById('footSummary').textContent=fmt(pcs)+' piezas · '+money(amt); document.getElementById('badgeCount').textContent=fmt(state.length)+' productos'; }
 function updateCard(bc){ const item=state.find(x=>barcodeKey(x.barcode)===barcodeKey(bc)); if(!item) return; const p=Number(item.pedido||0); render(); updateStats(getFiltered()); }
-function render(){ const rows=getFiltered(); listEl.className=window.innerWidth>=700?'list two-col':'list'; let html=''; rows.forEach(r=>{ const hasOrd=Number(r.pedido||0)>0; html += '<div class="card'+(hasOrd?' has-order':'')+'"><div class="topline"><div class="product">'+safe(r.producto)+'</div><div class="price">'+money(r.precio)+'</div></div><div class="meta">Barra: <strong>'+safe(r.barcode)+'</strong><br>Código: <strong>'+safe(r.codigo)+'</strong> · Cupo: <strong>'+fmt(r.cupo)+'</strong></div><div class="row"><div class="stepper"><button type="button" class="step-btn" data-action="minus" data-barcode="'+safe(r.barcode)+'">−</button><button type="button" class="qty-display" data-action="edit" data-barcode="'+safe(r.barcode)+'">'+Number(r.pedido||0)+'</button><button type="button" class="step-btn" data-action="plus" data-barcode="'+safe(r.barcode)+'">+</button></div><div class="qty-box"><label>Total línea</label><div class="line-money" data-barcode="'+safe(r.barcode)+'">'+money((Number(r.pedido||0))*Number(r.precio||0))+'</div></div></div><div class="line-total"><span>Piezas pedidas</span><strong>'+fmt(r.pedido||0)+'</strong></div></div>'; }); listEl.innerHTML=html; listEl.querySelectorAll('button[data-action]').forEach(btn=>{ btn.addEventListener('click',()=>{ const bc=btn.dataset.barcode; const act=btn.dataset.action; if(act==='edit') return openModal(bc); const item=state.find(x=>barcodeKey(x.barcode)===barcodeKey(bc)); if(!item) return; if(act==='plus') item.pedido=Number(item.pedido||0)+1; if(act==='minus') item.pedido=Math.max(0,Number(item.pedido||0)-1); render(); }); }); updateStats(rows); }
+function render(){
+  var rows=getFiltered();
+  listEl.className=window.innerWidth>=700?'list two-col':'list';
+  var html='';
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var hasOrd=Number(r.pedido||0)>0;
+    html+='<div class="card'+(hasOrd?' has-order':'')+'"><div class="topline"><div class="product">'+safe(r.producto)+'</div><div class="price">'+money(r.precio)+'</div></div><div class="meta">Barra: <strong>'+safe(r.barcode)+'</strong><br>Código: <strong>'+safe(r.codigo)+'</strong> · Cupo: <strong>'+fmt(r.cupo)+'</strong></div><div class="row"><div class="stepper"><button type="button" class="step-btn" data-action="minus" data-barcode="'+safe(r.barcode)+'">&#8722;</button><button type="button" class="qty-display" data-action="edit" data-barcode="'+safe(r.barcode)+'">'+Number(r.pedido||0)+'</button><button type="button" class="step-btn" data-action="plus" data-barcode="'+safe(r.barcode)+'">+</button></div><div class="qty-box"><label>Total línea</label><div class="line-money" data-barcode="'+safe(r.barcode)+'">'+money(Number(r.pedido||0)*Number(r.precio||0))+'</div></div></div><div class="line-total"><span>Piezas pedidas</span><strong>'+fmt(r.pedido||0)+'</strong></div></div>';
+  }
+  listEl.innerHTML=html;
+  listEl.querySelectorAll('button[data-action]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var bc=btn.dataset.barcode, act=btn.dataset.action;
+      if(act==='edit') return openModal(bc);
+      var item=state.find(function(x){ return barcodeKey(x.barcode)===barcodeKey(bc); });
+      if(!item) return;
+      if(act==='plus')  item.pedido=Number(item.pedido||0)+1;
+      if(act==='minus') item.pedido=Math.max(0,Number(item.pedido||0)-1);
+      savePedido();
+      render();
+    });
+  });
+  updateStats(rows);
+}
+
 function exportExcel(){
-  const pedidos=state.filter(r=>Number(r.pedido||0)>0);
+  var pedidos=state.filter(function(r){ return Number(r.pedido||0)>0; });
   if(!pedidos.length){ alert('No hay productos en el pedido.'); return; }
-  const data=pedidos.map(r=>({'Codigos de barra':r.barcode,'CODIGO':r.codigo,'CATEGORIA':r.categoria,'PRODUCTO':r.producto,'CUPO':Number(r.cupo||0),'PRECIO':Number(r.precio||0),'PEDIDO PIEZA':Number(r.pedido||0),'TOTAL $':parseFloat((Number(r.pedido||0)*Number(r.precio||0)).toFixed(2))}));
-  const ws=XLSX.utils.json_to_sheet(data,{header:['Codigos de barra','CODIGO','CATEGORIA','PRODUCTO','CUPO','PRECIO','PEDIDO PIEZA','TOTAL $']});
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Pedido');
-  const cli2=document.getElementById('cliente').value.trim().replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ\s]/g,'').trim().replace(/\s+/g,'_')||'pedido';
-  const dia2=document.getElementById('fecha').value||'';
-  const fname=(cli2+(dia2?'_'+dia2:'')+'_pedido').replace(/\s+/g,'_');
-  XLSX.writeFile(wb,fname+'.xlsx');
+  function cell(v){
+    var s=String(v===null||v===undefined?'':v);
+    return (s.indexOf(',')>=0||s.indexOf('"')>=0)?'"'+s.replace(/"/g,'""')+'"':s;
+  }
+  var rows=[['Codigos de barra','CODIGO','CATEGORIA','PRODUCTO','CUPO','PRECIO','PEDIDO PIEZA','TOTAL $']];
+  pedidos.forEach(function(r){
+    var p=Number(r.pedido||0);
+    rows.push([r.barcode,r.codigo,r.categoria,r.producto,
+      Number(r.cupo||0),Number(r.precio||0),p,
+      parseFloat((p*Number(r.precio||0)).toFixed(2))]);
+  });
+  var csv=rows.map(function(row){ return row.map(cell).join(','); }).join('\r\n');
+  var bom='\uFEFF';
+  var blob=new Blob([bom+csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  var cli=document.getElementById('cliente').value.trim().replace(/[^\w\s]/g,'').replace(/\s+/g,'_')||'pedido';
+  var dia=document.getElementById('fecha').value||'';
+  a.download=cli+(dia?'_'+dia:'')+'_pedido.csv';
+  document.body.appendChild(a); a.click();
+  showToast('✓ Excel descargado');
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },1000);
 }
 function exportPdf(){
   const ruta=document.getElementById('ruta').value||'';
@@ -241,149 +347,169 @@ function exportPdf(){
   });
   const cli3=cli.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ\s]/g,'').trim().replace(/\s+/g,'_')||'pedido';
   const fpdf=(cli3+(dia?'_'+dia:'')+'_pedido').replace(/\s+/g,'_');
-  const h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+fpdf+'</title><style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111}h2{margin:0 0 2px;font-size:15px}p.sub{margin:0 0 10px;color:#555;font-size:11px}.info{display:flex;gap:24px;margin-bottom:10px;flex-wrap:wrap}.info span{font-size:12px}.info b{color:#5b21b6}table{width:100%;border-collapse:collapse}th{background:#5b21b6;color:#fff;padding:7px 5px;text-align:center;font-size:11px}td{padding:5px 4px;border-bottom:1px solid #e5e7eb;text-align:center;font-size:11px}td.left{text-align:left}.tot td{font-weight:800;background:#ede9fe;border-top:2px solid #5b21b6}@media print{@page{margin:15mm}body{margin:0}}</style></head><body onload="window.print()">'
-    +'<h2>PLANTILLA DE PEDIDOS — Nutri-Americas S.A.</h2>'
-    +'<p class="sub">Generado el '+new Date().toLocaleDateString('es-PA',{day:'2-digit',month:'2-digit',year:'numeric'})+'</p>'
-    +'<div class="info"><span><b>Ruta:</b> '+safe(ruta)+'</span><span><b>Cliente:</b> '+safe(cli)+'</span><span><b>Día:</b> '+safe(dia)+'</span><span><b>Productos:</b> '+sel.length+'</span><span><b>Piezas:</b> '+pcs+'</span><span><b>Total:</b> '+money(amt)+'</span></div>'
-    +'<table><thead><tr><th>Barra</th><th>Código</th><th>Categoría</th><th>Producto</th><th>Pedido</th><th>Precio</th><th>Total</th></tr></thead><tbody>'+trs+'</tbody>'
-    +'<tfoot><tr class="tot"><td colspan="4">TOTAL</td><td>'+pcs+'</td><td></td><td>'+money(amt)+'</td></tr></tfoot></table>'
-    +'</body></html>';
+  var parts=[
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+fpdf+'</title>',
+    '<style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111}',
+    'h2{margin:0 0 2px;font-size:15px}p.sub{margin:0 0 10px;color:#555;font-size:11px}',
+    '.info{display:flex;gap:24px;margin-bottom:10px;flex-wrap:wrap}.info span{font-size:12px}.info b{color:#5b21b6}',
+    'table{width:100%;border-collapse:collapse}th{background:#5b21b6;color:#fff;padding:7px 5px;text-align:center;font-size:11px}',
+    'td{padding:5px 4px;border-bottom:1px solid #e5e7eb;text-align:center;font-size:11px}.tot td{font-weight:800;background:#ede9fe;border-top:2px solid #5b21b6}',
+    '@media print{@page{margin:15mm}body{margin:0}}</style></head>',
+    '<body onload="window.print()">',
+    '<h2>PLANTILLA DE PEDIDOS — Nutri-Americas S.A.</h2>',
+    '<p class="sub">Generado el '+new Date().toLocaleDateString('es-PA',{day:'2-digit',month:'2-digit',year:'numeric'})+'</p>',
+    '<div class="info">',
+    '<span><b>Ruta:</b> '+safe(ruta)+'</span>',
+    '<span><b>Cliente:</b> '+safe(cli)+'</span>',
+    '<span><b>Día:</b> '+safe(dia)+'</span>',
+    '<span><b>Productos:</b> '+sel.length+'</span>',
+    '<span><b>Piezas:</b> '+pcs+'</span>',
+    '<span><b>Total:</b> '+money(amt)+'</span>',
+    '</div>',
+    '<table><thead><tr><th>Barra</th><th>Código</th><th>Categoría</th><th>Producto</th><th>Pedido</th><th>Precio</th><th>Total</th></tr></thead>',
+    '<tbody>'+trs+'</tbody>',
+    '<tfoot><tr class="tot"><td colspan="4">TOTAL</td><td>'+pcs+'</td><td></td><td>'+money(amt)+'</td></tr></tfoot>',
+    '</table>',
+    '<'+'/'+'body>','<'+'/'+'html>'
+  ];
+  var h=parts.join('');
   const blob=new Blob([h],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url; a.download=fpdf+'.html';
   document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },800);
+  showToast('✓ PDF descargado');
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },800);
 }
 function parseCsvLine(line){ const res=[]; let cur=''; let inQ=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='"'){ if(inQ && line[i+1]==='"'){ cur+='"'; i++; } else inQ=!inQ; } else if(ch===',' && !inQ){ res.push(cur); cur=''; } else cur+=ch; } res.push(cur); return res; }
-function applyRows(rows,fileName){ if(!rows||rows.length<2){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Archivo vacío o sin datos.'; return; } const headers=(rows[0]||[]).map(normalizeHeader); const aliases={ barcode:['codigos de barra','codigo de barra','barra','barcode','ean'], codigo:['codigo','cod'], categoria:['categoria'], producto:['producto'], cupo:['cupo'], precio:['precio'], pedido:['pedido pieza','pedido'] }; const findCol=(list)=>{ for(const alias of list){ const idx=headers.findIndex(h=>h===alias||h.includes(alias)); if(idx>=0) return idx; } return -1; }; const iBar=findCol(aliases.barcode), iCod=findCol(aliases.codigo), iCat=findCol(aliases.categoria), iProd=findCol(aliases.producto), iCupo=findCol(aliases.cupo), iPre=findCol(aliases.precio), iPed=findCol(aliases.pedido); if(iProd<0){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='El archivo debe incluir la columna PRODUCTO.'; return; } const nuevos=[]; for(let i=1;i<rows.length;i++){ const r=rows[i]||[]; const prod=String(r[iProd]??'').trim(); if(!prod) continue; nuevos.push({ barcode:String(r[iBar]??'').trim(), codigo:String(r[iCod]??'').trim(), categoria:String(r[iCat]??'').trim(), producto:prod, cupo:normalizeNumber(r[iCupo]), precio:normalizeNumber(r[iPre]), pedido:Math.max(0, parseInt(normalizeNumber(r[iPed]),10)||0) }); } if(!nuevos.length){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='No encontré productos válidos para cargar.'; return; } state=nuevos; onlySelected=false; document.getElementById('btnOnly').textContent='Solo pedidos'; uploadStatus.style.color='var(--ok)'; uploadStatus.textContent='✓ '+nuevos.length+' productos cargados ('+fileName+')'; activeCat=null; buildCatFilter(); render(); }
+function applyRows(rows,fileName){ if(!rows||rows.length<2){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Archivo vacío o sin datos.'; return; } const headers=(rows[0]||[]).map(normalizeHeader); const aliases={ barcode:['codigos de barra','codigo de barra','barra','barcode','ean'], codigo:['codigo','cod'], categoria:['categoria'], producto:['producto'], cupo:['cupo'], precio:['precio'], pedido:['pedido pieza','pedido'] }; const findCol=(list)=>{ for(const alias of list){ const idx=headers.findIndex(h=>h===alias||h.includes(alias)); if(idx>=0) return idx; } return -1; }; const iBar=findCol(aliases.barcode), iCod=findCol(aliases.codigo), iCat=findCol(aliases.categoria), iProd=findCol(aliases.producto), iCupo=findCol(aliases.cupo), iPre=findCol(aliases.precio), iPed=findCol(aliases.pedido); if(iProd<0){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='El archivo debe incluir la columna PRODUCTO.'; return; } const nuevos=[]; for(let i=1;i<rows.length;i++){ const r=rows[i]||[]; const prod=String(r[iProd]??'').trim(); if(!prod) continue; nuevos.push({ barcode:String(r[iBar]??'').trim(), codigo:String(r[iCod]??'').trim(), categoria:String(r[iCat]??'').trim(), producto:prod, cupo:normalizeNumber(r[iCupo]), precio:normalizeNumber(r[iPre]), pedido:Math.max(0, parseInt(normalizeNumber(r[iPed]),10)||0) }); } if(!nuevos.length){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='No encontré productos válidos para cargar.'; return; } state=nuevos; onlySelected=false; document.getElementById('btnOnly').textContent='Solo pedidos'; showToast('✓ Plantilla actualizada'); uploadStatus.style.color='var(--ok)'; uploadStatus.textContent='✓ '+nuevos.length+' productos cargados ('+fileName+')'; activeCat=null; buildCatFilter(); render(); }
 document.getElementById('btnUpload').addEventListener('click',()=>document.getElementById('uploadFile').click());
-document.getElementById('uploadFile').addEventListener('change',function(e){ const file=e.target.files&&e.target.files[0]; if(!file) return; uploadStatus.style.color='var(--ok)'; uploadStatus.textContent='Leyendo...'; const ext=(file.name.split('.').pop()||'').toLowerCase(); if(ext==='xlsx'){ const reader=new FileReader(); reader.onload=function(ev){ try{ const data=new Uint8Array(ev.target.result); const wb=XLSX.read(data,{type:'array'}); const sheet=wb.Sheets[wb.SheetNames[0]]; const rows=XLSX.utils.sheet_to_json(sheet,{header:1,raw:false}); applyRows(rows,file.name); }catch(err){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Error al leer Excel: '+err.message; } e.target.value=''; }; reader.readAsArrayBuffer(file); } else if(ext==='csv'){ const reader=new FileReader(); reader.onload=function(ev){ try{ const text=String(ev.target.result||'').replace(/^\uFEFF/,''); const lines=text.split(/\r?\n/).filter(Boolean); const rows=lines.map(parseCsvLine); applyRows(rows,file.name); }catch(err){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Error al leer CSV: '+err.message; } e.target.value=''; }; reader.readAsText(file,'UTF-8'); } else { uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Formato no permitido. Usa .xlsx o .csv'; e.target.value=''; } });
-searchEl.addEventListener('input', render);
-document.getElementById('btnClear').addEventListener('click',()=>{ state=state.map(r=>({...r,pedido:0})); render(); });
+document.getElementById('uploadFile').addEventListener('change',function(e){ const file=e.target.files&&e.target.files[0]; if(!file) return; showToast('✓ Plantilla actualizada'); uploadStatus.style.color='var(--ok)'; uploadStatus.textContent='Leyendo...'; const ext=(file.name.split('.').pop()||'').toLowerCase(); if(ext==='xlsx'){ const reader=new FileReader(); reader.onload=function(ev){ try{ const data=new Uint8Array(ev.target.result); const wb=window.XLSX.read(data,{type:'array'}); const sheet=wb.Sheets[wb.SheetNames[0]]; const rows=window.XLSX.utils.sheet_to_json(sheet,{header:1,raw:false,defval:''}); applyRows(rows,file.name); }catch(err){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Error al leer Excel: '+err.message; } e.target.value=''; }; reader.readAsArrayBuffer(file); } else if(ext==='csv'){ const reader=new FileReader(); reader.onload=function(ev){ try{ const text=String(ev.target.result||'').replace(/^\uFEFF/,''); const lines=text.split(/\r?\n/).filter(Boolean); const rows=lines.map(parseCsvLine); applyRows(rows,file.name); }catch(err){ uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Error al leer CSV: '+err.message; } e.target.value=''; }; reader.readAsText(file,'UTF-8'); } else { uploadStatus.style.color='var(--danger)'; uploadStatus.textContent='Formato no permitido. Usa .xlsx o .csv'; e.target.value=''; } });
+searchEl.addEventListener('input', function(){
+  var btn = document.getElementById('btnClearSearch');
+  if(btn) btn.style.display = searchEl.value ? 'block' : 'none';
+  render();
+});
+document.getElementById('btnClear').addEventListener('click',function(){
+  if(!confirm('Limpiar todo el pedido?')) return;
+  state=state.map(function(r){ return Object.assign({},r,{pedido:0}); });
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  render();
+  showToast('Pedido limpiado');
+});
 document.getElementById('btnOnly').addEventListener('click',function(){ onlySelected=!onlySelected; this.textContent=onlySelected?'Ver todos':'Solo pedidos'; render(); });
 document.getElementById('btnExcelTop').addEventListener('click', exportExcel);
 document.getElementById('btnExcelBot').addEventListener('click', exportExcel);
 document.getElementById('btnPdfTop').addEventListener('click', exportPdf);
 document.getElementById('btnPdfBot').addEventListener('click', exportPdf);
+
 window.addEventListener('resize', render);
 // ── Theme switcher ─────────────────────────────────
-const THEMES = ['','theme-light','theme-blue','theme-green','theme-orange'];
-const dotIds = {'':'dot-dark','theme-light':'dot-light','theme-blue':'dot-blue','theme-green':'dot-green','theme-orange':'dot-orange'};
 function applyTheme(t){
-  THEMES.forEach(th=>{ if(th) document.body.classList.remove(th); });
+  ['theme-light','theme-blue','theme-green','theme-orange'].forEach(function(th){ document.body.classList.remove(th); });
   if(t) document.body.classList.add(t);
-  document.querySelectorAll('.theme-dot').forEach(d=>d.classList.remove('active'));
-  const active=document.getElementById(dotIds[t]||'dot-dark');
-  if(active) active.classList.add('active');
+  document.querySelectorAll('#themeToggle button').forEach(function(b){ b.classList.toggle('active', b.dataset.theme===t); });
   try{ localStorage.setItem('pedido_theme',t); }catch(e){}
 }
-document.querySelectorAll('.theme-dot').forEach(dot=>{
-  dot.addEventListener('click',()=>applyTheme(dot.dataset.theme||''));
+var themeToggleEl = document.getElementById('themeToggle');
+if(themeToggleEl){
+  themeToggleEl.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){ applyTheme(btn.dataset.theme||''); });
+  });
+}
+try{ var saved=localStorage.getItem('pedido_theme'); applyTheme(saved||''); }catch(e){ applyTheme(''); }
+// Service Worker para modo offline + instalación PWA
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+// Banner de instalación
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt = e;
+  var banner = document.getElementById('installBanner');
+  if(banner) banner.style.display = 'flex';
 });
-try{ const saved=localStorage.getItem('pedido_theme'); if(saved!==null) applyTheme(saved); }catch(e){}
+window.addEventListener('appinstalled', function(){
+  var banner = document.getElementById('installBanner');
+  if(banner) banner.style.display = 'none';
+  deferredPrompt = null;
+  showToast('✓ App instalada en pantalla de inicio');
+});
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('btnInstall');
+  if(btn) btn.addEventListener('click', function(){
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; document.getElementById('installBanner').style.display='none'; });
+  });
+  var close = document.getElementById('installClose');
+  if(close) close.addEventListener('click', function(){ document.getElementById('installBanner').style.display='none'; });
+});
+function showToast(msg){
+  var t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },2800);
+}
+
+// ── AutoSave ─────────────────────────────────────
+var SAVE_KEY='nutri_pedido_v1';
+function savePedido(){
+  try{
+    var data={
+      mercaderista: (document.getElementById('mercaderista')||{}).value||'',
+      ruta: document.getElementById('ruta').value||'',
+      cliente: document.getElementById('cliente').value||'',
+      fecha: document.getElementById('fecha').value||'',
+      pedidos: {}
+    };
+    state.forEach(function(r){ if(Number(r.pedido||0)>0) data.pedidos[barcodeKey(r.barcode)]=r.pedido; });
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  }catch(e){}
+}
+function loadPedido(){
+  try{
+    var raw=localStorage.getItem(SAVE_KEY);
+    if(!raw) return;
+    var data=JSON.parse(raw);
+    if(data.ruta)    document.getElementById('ruta').value=data.ruta;
+    if(data.cliente) document.getElementById('cliente').value=data.cliente;
+    if(data.fecha)   document.getElementById('fecha').value=data.fecha;
+    if(data.pedidos){
+      state.forEach(function(r){
+        var k=barcodeKey(r.barcode);
+        if(data.pedidos[k]) r.pedido=Number(data.pedidos[k]);
+      });
+    }
+    if(Object.keys(data.pedidos||{}).length>0){
+      showToast('✓ Pedido anterior recuperado');
+    }
+  }catch(e){}
+}
+// Guardar también cuando cambian los campos del formulario
+['ruta','cliente','fecha'].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el) el.addEventListener('change', savePedido);
+});
+loadPedido();
 buildCatFilter();
 render();
-// ── Botón subir arriba ──────────────────────────────
-(function(){
-  const btn = document.getElementById('btnScrollTop');
+
+// Scroll to top
+var scrollBtn = document.getElementById('scrollTopBtn');
+if(scrollBtn){
   window.addEventListener('scroll', function(){
-    if(window.scrollY > 300){
-      btn.classList.add('visible');
-    } else {
-      btn.classList.remove('visible');
-    }
-  }, {passive:true});
-  btn.addEventListener('click', function(){
+    scrollBtn.classList.toggle('visible', window.scrollY > 300);
+  });
+  scrollBtn.addEventListener('click', function(){
     window.scrollTo({top:0, behavior:'smooth'});
   });
-})();
+}
 </script>
 </body>
+
 </html>
-{
-  "name": "Pedidos Nutri-Americas",
-  "short_name": "Pedidos NA",
-  "description": "Plantilla de pedidos Nutri-Americas S.A.",
-  "start_url": "./pedido_final.html",
-  "display": "standalone",
-  "background_color": "#0f0f14",
-  "theme_color": "#5b21b6",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
-}
-const CACHE = 'nutri-pedidos-v1';
-const ASSETS = [
-  './pedido_final.html',
-  './manifest.json',
-  './icon.svg',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
-];
- 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
-  );
-});
- 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
-});
- 
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => cached))
-  );
-});
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Fondo degradado morado -->
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#5b21b6"/>
-      <stop offset="100%" style="stop-color:#c026d3"/>
-    </linearGradient>
-    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.15"/>
-      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Fondo redondeado -->
-  <rect width="512" height="512" rx="100" ry="100" fill="url(#bg)"/>
-  <rect width="512" height="512" rx="100" ry="100" fill="url(#shine)"/>
-
-  <!-- Ícono de caja/paquete con checkmark -->
-  <!-- Caja base -->
-  <path d="M256 110 L380 175 L380 340 L256 405 L132 340 L132 175 Z"
-        fill="none" stroke="#ffffff" stroke-width="18" stroke-linejoin="round"/>
-
-  <!-- Tapa de la caja -->
-  <path d="M132 175 L256 240 L380 175"
-        fill="none" stroke="#ffffff" stroke-width="18" stroke-linejoin="round"/>
-
-  <!-- Línea central de la tapa -->
-  <line x1="256" y1="240" x2="256" y2="405"
-        stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
-
-  <!-- Checkmark encima -->
-  <circle cx="370" cy="142" r="62" fill="#22c55e"/>
-  <polyline points="340,142 362,164 402,118"
-            fill="none" stroke="#ffffff" stroke-width="16"
-            stroke-linecap="round" stroke-linejoin="round"/>
-
-  <!-- Letras NA -->
-  <text x="256" y="470" text-anchor="middle"
-        font-family="Arial,sans-serif" font-weight="900"
-        font-size="48" fill="#e9d5ff" letter-spacing="4">NA</text>
-</svg>
