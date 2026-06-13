@@ -301,3 +301,89 @@ render();
 </script>
 </body>
 </html>
+{
+  "name": "Pedidos Nutri-Americas",
+  "short_name": "Pedidos NA",
+  "description": "Plantilla de pedidos Nutri-Americas S.A.",
+  "start_url": "./pedido_final.html",
+  "display": "standalone",
+  "background_color": "#0f0f14",
+  "theme_color": "#5b21b6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+const CACHE = 'nutri-pedidos-v1';
+const ASSETS = [
+  './pedido_final.html',
+  './manifest.json',
+  './icon.svg',
+  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+];
+ 
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
+});
+ 
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+ 
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => cached))
+  );
+});
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo degradado morado -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5b21b6"/>
+      <stop offset="100%" style="stop-color:#c026d3"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo redondeado -->
+  <rect width="512" height="512" rx="100" ry="100" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="100" ry="100" fill="url(#shine)"/>
+
+  <!-- Ícono de caja/paquete con checkmark -->
+  <!-- Caja base -->
+  <path d="M256 110 L380 175 L380 340 L256 405 L132 340 L132 175 Z"
+        fill="none" stroke="#ffffff" stroke-width="18" stroke-linejoin="round"/>
+
+  <!-- Tapa de la caja -->
+  <path d="M132 175 L256 240 L380 175"
+        fill="none" stroke="#ffffff" stroke-width="18" stroke-linejoin="round"/>
+
+  <!-- Línea central de la tapa -->
+  <line x1="256" y1="240" x2="256" y2="405"
+        stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Checkmark encima -->
+  <circle cx="370" cy="142" r="62" fill="#22c55e"/>
+  <polyline points="340,142 362,164 402,118"
+            fill="none" stroke="#ffffff" stroke-width="16"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Letras NA -->
+  <text x="256" y="470" text-anchor="middle"
+        font-family="Arial,sans-serif" font-weight="900"
+        font-size="48" fill="#e9d5ff" letter-spacing="4">NA</text>
+</svg>
